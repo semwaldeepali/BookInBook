@@ -3,7 +3,8 @@ package drawrite.booknet;
 import com.google.gson.annotations.SerializedName;
 // Model class
 
-public class Book {
+public class Book { //[TODO] divide the scripts into different folders like model , api, client etc
+    //[TODO] improve the data and fix on the api to be used/ or how to use for getting data
     @SerializedName("title")
     private String title;
 

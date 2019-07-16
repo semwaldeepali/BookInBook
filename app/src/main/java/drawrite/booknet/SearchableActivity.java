@@ -81,6 +81,14 @@ public class SearchableActivity extends AppCompatActivity {
             Log.d("SearchableActivity","Got the search query");
             //use the query to search your data somehow
             /*Create handle for the RetrofitInstance interface*/
+            /* [TODO] add the logic for local and asyncronous web search for the book
+                case 1: if (new book) [how to conclude if new book ?]
+                            1. fetch information from openlibrary api.
+                            2. update data locally and on web
+                            3. give options "mentioned in " & "mentions"
+                                    search "mBook" locally and web ; update both
+
+             */
             BookNetAPI service = BookNetClient.getRetrofitInstance().create(BookNetAPI.class);
             Call<List<Book>> call = service.read(query);
             call.enqueue(new Callback<List<Book>>() {
