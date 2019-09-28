@@ -10,9 +10,11 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import drawrite.booknet.model.Book;
+
 public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder> {
 
-    private List<Book> dataList;
+    private List<Book> dataList; // list of Books
     private Context context;
 
     public BookAdapter(Context context,List<Book> dataList){

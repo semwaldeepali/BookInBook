@@ -17,12 +17,16 @@ import android.widget.Toast;
 
 import java.util.List;
 
+import drawrite.booknet.apiClient.BookNetAPI;
+import drawrite.booknet.apiClient.BookNetClient;
+import drawrite.booknet.model.Book;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class SearchableActivity extends AppCompatActivity {
 
+    public static final String EXTRA_QUERY = "";
     private BookAdapter adapter;
     private RecyclerView recyclerView;
 
@@ -34,7 +38,7 @@ public class SearchableActivity extends AppCompatActivity {
         setContentView(R.layout.activity_searchable);
 
         Log.d("SearchableActivity","onCreateFunction");
-
+        //[TODO] 1. add progress bar when search is happening.
         // Get the intent, verify the action and get the query
         Intent intent = getIntent();
         handleIntent(intent);
@@ -77,18 +81,37 @@ public class SearchableActivity extends AppCompatActivity {
             progressDialog.setMessage("Loading....");
             progressDialog.show();
 
+            // [TODO] implement function to check the query is valid
             String query = intent.getStringExtra(SearchManager.QUERY);
             Log.d("SearchableActivity","Got the search query");
-            //use the query to search your data somehow
-            /*Create handle for the RetrofitInstance interface*/
-            /* [TODO] add the logic for local and asyncronous web search for the book
-                case 1: if (new book) [how to conclude if new book ?]
-                            1. fetch information from openlibrary api.
-                            2. update data locally and on web
-                            3. give options "mentioned in " & "mentions"
-                                    search "mBook" locally and web ; update both
+
+            /* [TODO] add the logic for local and asynchronous web search for the book
+
+                when search is received :
+                1. if (book_id exists in local db) :
+                        show book data
+                        1.1 if(mentions data exists)
+                            1.1.1 show the data and give relevant edit option.
+                        1.2 else
+                            1.2.1 give both edit options.
+                2. else if ( book_id exists in booknet server)
+                        show book data
+                        2.1 if(mentions data exists)
+                            2.1.1 show the data and give relevant edit option.
+                        2.2 else
+                            2.2.1 give both edit options.
+                3. else
+                    3.1 access open library data to get book information
+                    3.2 update local and web data
+                    3.3 give both edit options
+
 
              */
+            // [TODO] implement Case 1
+
+            //Case 2
+            /*Create handle for the RetrofitInstance interface
+            [TODO] figure out processing sequence (parrallel or serial) for these 3 cases
             BookNetAPI service = BookNetClient.getRetrofitInstance().create(BookNetAPI.class);
             Call<List<Book>> call = service.read(query);
             call.enqueue(new Callback<List<Book>>() {
@@ -104,7 +127,14 @@ public class SearchableActivity extends AppCompatActivity {
                     progressDialog.dismiss();
                     Toast.makeText(SearchableActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
                 }
-            });
+            });*/
+
+            // case 3
+            // call OLBookList Activity
+            Intent OLintent = new Intent(this, OLBookListActivity.class);
+            OLintent.putExtra("EXTRA_QUERY", query);
+            startActivity(OLintent);
+
         }
 
 

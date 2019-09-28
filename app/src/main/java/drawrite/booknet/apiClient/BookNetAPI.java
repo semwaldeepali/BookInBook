@@ -1,10 +1,13 @@
-package drawrite.booknet;
+package drawrite.booknet.apiClient;
 
 import java.util.List;
 
+import drawrite.booknet.model.Book;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
+
+// This contains the actual functions for calling booknet personal api services
 
 public interface BookNetAPI {
 

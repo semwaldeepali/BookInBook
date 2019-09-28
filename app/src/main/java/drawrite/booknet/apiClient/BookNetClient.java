@@ -1,9 +1,10 @@
-package drawrite.booknet;
+package drawrite.booknet.apiClient;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 // retrofit.builder class
+// Building the class for creating a communicating channel to the booknet personal api server
 public class BookNetClient {
         public static Retrofit retrofit;
 

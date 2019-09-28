@@ -4,76 +4,105 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
-@Entity(tableName = "book")
+import java.util.Date;
+
+@Entity(tableName = "books")
 public class Book {
 
     @PrimaryKey(autoGenerate = true)
-    private int bid;
+    private int id = 0;
 
-    @ColumnInfo(name = "book_id")
-    private String bookId;
+    @ColumnInfo(name = "book_ol_id")
+    private String OLId;
 
-    @ColumnInfo(name = "original_title")
-    private String originalTitle;
+    public String goodReadsId;
 
-    @ColumnInfo(name = "title")
+    @ColumnInfo(name = "book_title")
     private String title;
 
-    @ColumnInfo(name = "original_publication_year")
-    private String originalPublicationYear;
+    @ColumnInfo(name = "book_subtitle")
+    private String subTitle;
 
-    @ColumnInfo(name ="language_code")
-    private String language;
+    @ColumnInfo(name = "book_author")
+    private String author;
+
+    @ColumnInfo(name = "book_publisher")
+    private String publisher;
+
+    @ColumnInfo(name = "book_publish_date")
+    private String publishYear;
+
+    @ColumnInfo(name = "book_nr_pages")
+    private int nrPages;
 
     //getters
-    public int getBid(){
-        return bid;
+
+    public int getId(){ //no setter for id as auto increment
+        return id;
     }
 
-    public String getBookId() {
-        return bookId;
+    public String getOLId(){
+        return OLId;
     }
 
-    public String getLanguage() {
-        return language;
+    public String getGoodReadsId(){
+        return goodReadsId;
     }
 
-    public String getOriginalPublicationYear() {
-        return originalPublicationYear;
-    }
-
-    public String getOriginalTitle() {
-        return originalTitle;
-    }
-
-    public String getTitle() {
+    public String getTitle(){
         return title;
     }
 
-    //setters
-
-    public void setBid(int bid) {
-        this.bid = bid;
+    public String getSubTitle(){
+        return subTitle;
     }
 
-    public void setBookId(String bookId) {
-        this.bookId = bookId;
+    public String getAuthor(){
+        return author;
     }
 
-    public void setLanguage(String language) {
-        this.language = language;
+    public  String getPublisher(){
+        return publisher;
     }
 
-    public void setOriginalPublicationYear(String originalPublicationYear) {
-        this.originalPublicationYear = originalPublicationYear;
+    public String getPublishYear(){
+        return publishYear;
+    }
+    public int getNrPages(){
+        return nrPages;
     }
 
-    public void setOriginalTitle(String originalTitle) {
-        this.originalTitle = originalTitle;
+    //Setters
+    public void setOLId(String OLId) {
+        this.OLId = OLId;
+    }
+
+    public void setGoodReadsId(String goodReadsId) {
+        this.goodReadsId = goodReadsId;
     }
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public void setSubTitle(String subTitle) {
+        this.subTitle = subTitle;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public void setPublisher(String publisher) {
+        this.publisher = publisher;
+    }
+
+    public void setPublishYear(String publishYear) {
+        this.publishYear = publishYear;
+    }
+
+    public void setNrPages(int nrPages) {
+        this.nrPages = nrPages;
     }
 
 }

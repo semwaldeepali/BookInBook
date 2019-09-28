@@ -27,12 +27,26 @@
             android:launchMode="singleTop"
             android:theme="@style/AppTheme">
             <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
+                <action android:name="android.intent.action.SEARCH"  />
             </intent-filter>
 
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
+        </activity>
+
+        <activity
+            android:name=".OLBookListActivity"
+            android:launchMode="singleTop">
+        </activity>
+
+        <activity android:name=".BookDetailActivity"
+            android:launchMode="singleTop">
+
+        </activity>
+        <activity android:name=".BookDetailActivityTabbed"
+            android:launchMode="singleTop">
+
         </activity>
 
         <!-- Points to searchable activity so the whole app can invoke search. -->
