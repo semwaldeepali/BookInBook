@@ -1,13 +1,17 @@
 package drawrite.booknet;
 
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -57,6 +61,22 @@ public class OLBookListActivity extends AppCompatActivity {
         // set the listener for details
         setupBookSelectedListener(isFreshQuery);
     }
+
+    // This inflates the search option
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+        SearchManager searchManager =
+                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView =
+                (SearchView) menu.findItem(R.id.menu_search).getActionView();
+        searchView.setSearchableInfo(
+                searchManager.getSearchableInfo(getComponentName()));
+
+        return true;
+    }
+
     // 1. Executes an API call to the OpenLibrary search endpoint, 2. parses the results
     // 3. Converts them into an array of book objects and adds them to the adapter
     private void fetchBooks(String query) {

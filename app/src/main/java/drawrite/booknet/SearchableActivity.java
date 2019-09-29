@@ -38,6 +38,7 @@ public class SearchableActivity extends AppCompatActivity {
         setContentView(R.layout.activity_searchable);
 
         Log.d("SearchableActivity","onCreateFunction");
+
         //[TODO] 1. add progress bar when search is happening.
         // Get the intent, verify the action and get the query
         Intent intent = getIntent();

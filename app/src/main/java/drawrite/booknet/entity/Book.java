@@ -4,7 +4,6 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
-import java.util.Date;
 
 @Entity(tableName = "books")
 public class Book {
@@ -36,14 +35,11 @@ public class Book {
     private int nrPages;
 
     //getters
-
     public int getId(){ //no setter for id as auto increment
         return id;
     }
 
-    public String getOLId(){
-        return OLId;
-    }
+    public String getOLId(){ return OLId; }
 
     public String getGoodReadsId(){
         return goodReadsId;
@@ -65,17 +61,18 @@ public class Book {
         return publisher;
     }
 
-    public String getPublishYear(){
-        return publishYear;
-    }
+    public String getPublishYear(){ return publishYear; }
+
     public int getNrPages(){
         return nrPages;
     }
 
     //Setters
-    public void setOLId(String OLId) {
-        this.OLId = OLId;
-    }
+    // TODO was getting "error: Cannot find setter for field." Hence adding setter for autoincrement field
+
+    public void setId(int id){ this.id = id; }
+
+    public void setOLId(String OLId) { this.OLId = OLId; }
 
     public void setGoodReadsId(String goodReadsId) {
         this.goodReadsId = goodReadsId;
@@ -85,9 +82,7 @@ public class Book {
         this.title = title;
     }
 
-    public void setSubTitle(String subTitle) {
-        this.subTitle = subTitle;
-    }
+    public void setSubTitle(String subTitle) { this.subTitle = subTitle; }
 
     public void setAuthor(String author) {
         this.author = author;

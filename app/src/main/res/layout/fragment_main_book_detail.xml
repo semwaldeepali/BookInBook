@@ -58,6 +58,7 @@
                     android:layout_marginTop="8dp" />
 
                 <TextView
+                    android:id = "@+id/tvPublishedByText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -70,6 +71,7 @@
                     android:layout_height="wrap_content"
                     android:textSize="14sp" />
                 <TextView
+                    android:id = "@+id/tvPublishedYearText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -83,6 +85,7 @@
                     android:textSize="14sp" />
 
                 <TextView
+                    android:id = "@+id/tvPageCountText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"

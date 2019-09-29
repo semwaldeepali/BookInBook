@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -37,9 +36,14 @@ public class MainBookDetailFragment extends Fragment {
     private TextView tvTitle;
     private TextView tvSubTitle;
     private TextView tvAuthor;
+    private TextView tvPublishedByText;
     private TextView tvPublisher;
+    private TextView tvPublishedByYearText;
     private TextView tvPublishYear;
+
+    private TextView tvPageCountText;
     private TextView tvPageCount;
+
     private OLBookClient client;
     public MainBookDetailFragment() {
         // Required empty public constructor
@@ -57,9 +61,16 @@ public class MainBookDetailFragment extends Fragment {
         ivBookCover =  view.findViewById(R.id.ivBookCover);
         tvTitle =  view.findViewById(R.id.tvTitle);
         tvAuthor =  view.findViewById(R.id.tvAuthor);
+
+        tvPublishedByText = view.findViewById(R.id.tvPublishedByText);
         tvPublisher =  view.findViewById(R.id.tvPublisher);
+
+        tvPageCountText = view.findViewById(R.id.tvPageCountText);
         tvPageCount =  view.findViewById(R.id.tvPageCount);
+
+        tvPublishedByYearText = view.findViewById(R.id.tvPublishedYearText);
         tvPublishYear =  view.findViewById(R.id.tvPublishYear);
+
         tvSubTitle =  view.findViewById(R.id.tvSubTitle);
 
         // Use the book to populate the data into our views
@@ -77,12 +88,35 @@ public class MainBookDetailFragment extends Fragment {
         Context c = getActivity().getApplicationContext(); // cannot directly set picasso without getting activity context
         Picasso.with(c).load(Uri.parse(book.getLargeCoverUrl())).error(R.drawable.ic_nocover).into(ivBookCover);
 
+        String bookTitle = book.getTitle();
+        String subTitle = book.getSubTitle();
+        String author = book.getAuthor();
+        String publishYear = book.getPublishYear();
 
-        //change activity title
-        tvTitle.setText(book.getTitle());
-        tvSubTitle.setText(book.getSubTitle());
-        tvAuthor.setText(book.getAuthor());
-        tvPublishYear.setText(book.getPublishYear());
+        //update the book details whatever is present.
+        if(!bookTitle.isEmpty() && bookTitle!=null)
+            tvTitle.setText(bookTitle);
+        else
+            tvTitle.setVisibility(View.INVISIBLE);
+
+        if(!subTitle.isEmpty() && subTitle!=null)
+            tvSubTitle.setText(subTitle);
+        else
+            tvSubTitle.setVisibility(View.INVISIBLE);
+
+        if(!author.isEmpty() && author!=null)
+            tvAuthor.setText(author);
+        else
+            tvAuthor.setVisibility(View.INVISIBLE);
+
+        if(!publishYear.isEmpty() && publishYear!=null)
+            tvPublishYear.setText(publishYear);
+        else
+        {
+            tvPublishedByYearText.setVisibility(View.INVISIBLE);
+            tvPublishYear.setVisibility(View.INVISIBLE);
+        }
+
         // fetch extra book data from books API
         client = new OLBookClient();
         client.getExtraBookDetails(book.getOpenLibraryId(), new JsonHttpResponseHandler() {
@@ -97,10 +131,28 @@ public class MainBookDetailFragment extends Fragment {
                         for (int i = 0; i < numPublishers; ++i) {
                             publishers[i] = publisher.getString(i);
                         }
-                        tvPublisher.setText(TextUtils.join(", ", publishers));
+                        String pubList = TextUtils.join(", ", publishers);
+                        if(!pubList.isEmpty() && pubList!=null)
+                            tvPublisher.setText(pubList);
+                        else
+                        {
+                            tvPublishedByText.setVisibility(View.INVISIBLE);
+                            tvPublisher.setVisibility(View.INVISIBLE);
+                        }
+
+
                     }
                     if (response.has("number_of_pages")) {
-                        tvPageCount.setText(Integer.toString(response.getInt("number_of_pages")) + " pages");
+                        String nrPages = Integer.toString(response.getInt("number_of_pages")) ;
+                        // TODO fix the pageCountText not getting invisible ... look for book : Grimms' Fairy Tales
+                        if(!nrPages.isEmpty() && nrPages!=null)
+                            tvPageCount.setText(nrPages + " pages") ;
+                        else
+                        {
+                            tvPageCountText.setVisibility(View.INVISIBLE);
+                            tvPageCount.setVisibility(View.INVISIBLE);
+                        }
+
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
