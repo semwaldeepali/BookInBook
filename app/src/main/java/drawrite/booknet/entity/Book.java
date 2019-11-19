@@ -5,14 +5,14 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
 
-@Entity(tableName = "books")
+@Entity(tableName = "book_table") // table name convention as sql
 public class Book {
 
     @PrimaryKey(autoGenerate = true)
-    private int id = 0;
+    private int id;
 
     @ColumnInfo(name = "book_ol_id")
-    private String OLId;
+    private String olid;
 
     public String goodReadsId;
 
@@ -34,12 +34,24 @@ public class Book {
     @ColumnInfo(name = "book_nr_pages")
     private int nrPages;
 
+    //constructor
+    public Book(String olid, String goodReadsId, String title, String subTitle, String author, String publisher, String publishYear, int nrPages) {
+        this.olid = olid;
+        this.goodReadsId = goodReadsId;
+        this.title = title;
+        this.subTitle = subTitle;
+        this.author = author;
+        this.publisher = publisher;
+        this.publishYear = publishYear;
+        this.nrPages = nrPages;
+    }
+
     //getters
     public int getId(){ //no setter for id as auto increment
         return id;
     }
 
-    public String getOLId(){ return OLId; }
+    public String getOlId(){ return olid; }
 
     public String getGoodReadsId(){
         return goodReadsId;
@@ -68,36 +80,10 @@ public class Book {
     }
 
     //Setters
-    // TODO was getting "error: Cannot find setter for field." Hence adding setter for autoincrement field
+    //Was getting "error: Cannot find setter for field." Hence adding setter for autoincrement field
 
     public void setId(int id){ this.id = id; }
 
-    public void setOLId(String OLId) { this.OLId = OLId; }
 
-    public void setGoodReadsId(String goodReadsId) {
-        this.goodReadsId = goodReadsId;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setSubTitle(String subTitle) { this.subTitle = subTitle; }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
-    public void setPublisher(String publisher) {
-        this.publisher = publisher;
-    }
-
-    public void setPublishYear(String publishYear) {
-        this.publishYear = publishYear;
-    }
-
-    public void setNrPages(int nrPages) {
-        this.nrPages = nrPages;
-    }
 
 }

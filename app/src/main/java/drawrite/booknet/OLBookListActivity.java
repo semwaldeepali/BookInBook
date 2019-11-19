@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import drawrite.booknet.apiClient.OLBookClient;
 import drawrite.booknet.model.OLBook;
 
-public class OLBookListActivity extends AppCompatActivity {
+public class OLBookListActivity extends BaseActivity {
     public static final String BOOK_DETAIL_KEY = "Book";
 
     private boolean isFreshQuery ;

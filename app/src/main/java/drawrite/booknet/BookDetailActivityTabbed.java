@@ -10,7 +10,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.widget.SearchView;
 
-public class BookDetailActivityTabbed extends AppCompatActivity {
+public class BookDetailActivityTabbed extends BaseActivity {
     private BookDetailTabAdapter adapter;
     private TabLayout tabLayout;
     private ViewPager viewPager;
