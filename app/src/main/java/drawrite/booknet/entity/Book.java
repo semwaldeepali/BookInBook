@@ -32,10 +32,10 @@ public class Book {
     private String publishYear;
 
     @ColumnInfo(name = "book_nr_pages")
-    private int nrPages;
+    private String nrPages;
 
     //constructor
-    public Book(String olid, String goodReadsId, String title, String subTitle, String author, String publisher, String publishYear, int nrPages) {
+    public Book(String olid, String goodReadsId, String title, String subTitle, String author, String publisher, String publishYear, String nrPages) {
         this.olid = olid;
         this.goodReadsId = goodReadsId;
         this.title = title;
@@ -51,7 +51,7 @@ public class Book {
         return id;
     }
 
-    public String getOlId(){ return olid; }
+    public String getOlid(){ return olid; }
 
     public String getGoodReadsId(){
         return goodReadsId;
@@ -75,7 +75,7 @@ public class Book {
 
     public String getPublishYear(){ return publishYear; }
 
-    public int getNrPages(){
+    public String getNrPages(){
         return nrPages;
     }
 

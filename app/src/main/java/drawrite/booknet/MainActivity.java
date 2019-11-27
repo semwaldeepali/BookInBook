@@ -20,10 +20,8 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
         Log.d("MainActivity","onCreateFunction");
 
-        /*//sets up the toolbar as an actionbar for the activity
-        toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);*/
     }
+    /*
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -41,7 +39,8 @@ public class MainActivity extends BaseActivity {
 
         Log.d("MainActivity","onCreateOptionsMenu Inflated and search associated");
         return true;
-    }
+
+    }*/
 
 }
 

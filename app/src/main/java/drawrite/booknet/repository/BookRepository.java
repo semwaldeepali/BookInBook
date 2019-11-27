@@ -11,6 +11,7 @@ import drawrite.booknet.database.BookDatabase;
 import drawrite.booknet.entity.Book;
 
 public class BookRepository {
+
     private BookDao bookDao;
 
     private LiveData<List<Book>> allBooks;
@@ -47,7 +48,7 @@ public class BookRepository {
         }
         @Override
         protected Void doInBackground(Book... books){
-            bookDao.insertBook(book[0]);
+            bookDao.insertBook(books[0]);
             return null;
         }
     }
@@ -60,7 +61,7 @@ public class BookRepository {
         }
         @Override
         protected Void doInBackground(Book... books){
-            bookDao.updateBook(book[0]);
+            bookDao.updateBook(books[0]);
             return null;
         }
     }

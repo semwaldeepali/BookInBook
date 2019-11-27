@@ -17,17 +17,12 @@ import android.widget.Toast;
 
 import java.util.List;
 
-import drawrite.booknet.apiClient.BookNetAPI;
-import drawrite.booknet.apiClient.BookNetClient;
 import drawrite.booknet.model.Book;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class SearchableActivity extends AppCompatActivity {
 
     public static final String EXTRA_QUERY = "";
-    private BookAdapter adapter;
+    //private BookAdapter adapter;
     private RecyclerView recyclerView;
 
     ProgressDialog progressDialog;
@@ -40,6 +35,8 @@ public class SearchableActivity extends AppCompatActivity {
         Log.d("SearchableActivity","onCreateFunction");
 
         //[TODO] 1. add progress bar when search is happening.
+        // TODO: 2. handle pressing of back button after search
+
         // Get the intent, verify the action and get the query
         Intent intent = getIntent();
         handleIntent(intent);
@@ -57,16 +54,6 @@ public class SearchableActivity extends AppCompatActivity {
                 searchManager.getSearchableInfo(getComponentName()));
 
         return true;
-    }
-
-    /*Method to generate List of data using RecyclerView with custom adapter*/
-    private void generateDataList(List<Book> bookList){
-        Log.d("SearchableActivity","Generating Data List");
-        recyclerView = (RecyclerView) findViewById(R.id.customRecyclerView);
-        adapter = new BookAdapter(this,bookList);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(SearchableActivity.this);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(adapter);
     }
 
     @Override

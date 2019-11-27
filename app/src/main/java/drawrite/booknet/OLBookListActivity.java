@@ -1,17 +1,17 @@
 package drawrite.booknet;
 
+import android.app.Application;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.SearchView;
+import android.support.v7.widget.SearchView;
 import android.widget.Toast;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -25,7 +25,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import drawrite.booknet.apiClient.OLBookClient;
+import drawrite.booknet.entity.Book;
 import drawrite.booknet.model.OLBook;
+import drawrite.booknet.repository.BookRepository;
 
 public class OLBookListActivity extends BaseActivity {
     public static final String BOOK_DETAIL_KEY = "Book";
@@ -40,7 +42,7 @@ public class OLBookListActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ol_book_list);
-        lvBooks = (ListView) findViewById(R.id.lvBooks);
+        lvBooks = findViewById(R.id.lvBooks);
         ArrayList<OLBook> aBooks = new ArrayList<OLBook>();
         bookAdapter = new OLBookAdapter(this, aBooks);
         lvBooks.setAdapter(bookAdapter);
@@ -118,12 +120,25 @@ public class OLBookListActivity extends BaseActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.d("OLBookListActivity", "Book selected !");
-                //[TODO] 1. Asynchronous adding the book to the local [web updating later]
+
 
 
                 // [TODO] 2. Launch the detail view passing book as an extra (with the option of adding the mention edge)
                 if (isFreshQuery) {
-                    //Intent intent = new Intent(OLBookListActivity.this, BookDetailActivity.class);
+
+
+                    // 1. Asynchronous adding the book to the local
+                    // TODO: Web updating ; [Also, if this is the best place to update local cache]
+                    Toast.makeText(getApplicationContext(), "added", Toast.LENGTH_SHORT).show();
+
+                    BookRepository repository = new BookRepository((Application) getApplicationContext());
+                    drawrite.booknet.model.OLBook OLbook = bookAdapter.getItem(position);
+                    repository.insert(new Book(OLbook.getOpenLibraryId(),OLbook.getGoodReadsId(),
+                            OLbook.getTitle(),OLbook.getSubTitle(),OLbook.getAuthor(),OLbook.getPublisher(),
+                            OLbook.getPublishYear(),Integer.toString(OLbook.getNrPages())));
+
+
+                    // Starting detail activity
                     Intent intent = new Intent(OLBookListActivity.this, BookDetailActivityTabbed.class);
                     intent.putExtra(BOOK_DETAIL_KEY, bookAdapter.getItem(position));
                     startActivity(intent);
