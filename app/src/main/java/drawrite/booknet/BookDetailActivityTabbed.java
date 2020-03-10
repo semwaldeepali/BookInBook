@@ -2,14 +2,19 @@ package drawrite.booknet;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.support.v7.widget.SearchView;
+import android.widget.Toast;
 
-public class BookDetailActivityTabbed extends BaseActivity {
+import static drawrite.booknet.OLBookListActivity.IS_FRESH_QUERY;
+import static drawrite.booknet.SearchableActivity.EXTRA_QUERY;
+
+public class BookDetailActivityTabbed extends BaseActivity implements SearchDialog.SearchDialogListener{
     private BookDetailTabAdapter adapter;
     private TabLayout tabLayout;
     private ViewPager viewPager;
@@ -42,6 +47,18 @@ public class BookDetailActivityTabbed extends BaseActivity {
                 searchManager.getSearchableInfo(getComponentName()));
 
         return true;
+    }
+
+    @Override
+    // Call the search activity here for searching with add link functionality
+    public void applyTexts(String bookName){
+
+        Intent OLintent = new Intent(this, OLBookListActivity.class);
+        OLintent.putExtra(EXTRA_QUERY, bookName);
+        OLintent.putExtra(IS_FRESH_QUERY,false);
+        startActivity(OLintent);
+        Toast.makeText(this, "got book name to search : " + bookName, Toast.LENGTH_SHORT).show();
+
     }
 
 }

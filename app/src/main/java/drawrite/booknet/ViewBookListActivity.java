@@ -1,14 +1,11 @@
 package drawrite.booknet;
 
 import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.widget.Toast;
 
 import java.util.List;
 
@@ -21,6 +18,7 @@ public class ViewBookListActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
+        //TODO : On clicking book show the book details
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_list);
 

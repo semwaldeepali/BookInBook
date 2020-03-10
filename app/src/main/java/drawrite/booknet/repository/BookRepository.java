@@ -2,6 +2,8 @@ package drawrite.booknet.repository;
 
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
+import android.arch.persistence.room.Insert;
+import android.arch.persistence.room.OnConflictStrategy;
 import android.os.AsyncTask;
 
 import java.util.List;
@@ -22,6 +24,7 @@ public class BookRepository {
         allBooks = bookDao.getAllBooks();
     }
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     public void insert(Book book){
         new InsertBookAsyncTask(bookDao).execute(book);
 

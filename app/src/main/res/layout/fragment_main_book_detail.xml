@@ -98,6 +98,17 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:textSize="14sp" />
+
+                <Button
+                    android:id="@+id/btnAddEdge"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Add Link"
+                    android:background="@color/colorAccent"
+                    android:visibility="invisible"
+                    />
+
             </LinearLayout>
         </ScrollView>
     </LinearLayout>

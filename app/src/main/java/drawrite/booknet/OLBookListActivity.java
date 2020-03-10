@@ -1,5 +1,7 @@
 package drawrite.booknet;
 
+//perform search and list the searched books
+
 import android.app.Application;
 import android.app.SearchManager;
 import android.content.Context;
@@ -29,8 +31,11 @@ import drawrite.booknet.entity.Book;
 import drawrite.booknet.model.OLBook;
 import drawrite.booknet.repository.BookRepository;
 
+import static drawrite.booknet.SearchableActivity.EXTRA_QUERY;
+
 public class OLBookListActivity extends BaseActivity {
     public static final String BOOK_DETAIL_KEY = "Book";
+    public static final String IS_FRESH_QUERY = "IsFreshQuery";
 
     private boolean isFreshQuery ;
     private ListView lvBooks;
@@ -50,12 +55,12 @@ public class OLBookListActivity extends BaseActivity {
 
         //get the query
         Intent intent = getIntent();
-        query = intent.getStringExtra("EXTRA_QUERY");
+        query = intent.getStringExtra(EXTRA_QUERY);
         Log.d("OLBookListActivity", "after accessing query !");
         Log.d("OLBookListActivity", query);
 
         //check if it is fresh query
-        isFreshQuery = intent.getBooleanExtra("isFreshQuery", true);
+        isFreshQuery = intent.getBooleanExtra(IS_FRESH_QUERY, true);
 
         //fetch books remotely TODO move to asynchronous thread [?]
         fetchBooks(query);
@@ -79,7 +84,8 @@ public class OLBookListActivity extends BaseActivity {
         return true;
     }
 
-    // 1. Executes an API call to the OpenLibrary search endpoint, 2. parses the results
+    // 1. Executes an API call to the OpenLibrary search endpoint,
+    // 2. parses the results
     // 3. Converts them into an array of book objects and adds them to the adapter
     private void fetchBooks(String query) {
         client = new OLBookClient();
@@ -100,6 +106,7 @@ public class OLBookListActivity extends BaseActivity {
                         bookAdapter.clear();
 
                         // Load model objects into the adapter
+                        // TODO : Provide check option to add the "mentions" book.
                         for (OLBook book : books) {
                             bookAdapter.add(book); // add book through the adapter
                         }
@@ -113,7 +120,8 @@ public class OLBookListActivity extends BaseActivity {
         });
     }
 
-    // Executes the selection of book; start detail intent
+    // 1.Executes the selection of book;
+    // 2.Start detail intent
     public void setupBookSelectedListener(final boolean isFreshQuery) {
 
         lvBooks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -124,35 +132,27 @@ public class OLBookListActivity extends BaseActivity {
 
 
                 // [TODO] 2. Launch the detail view passing book as an extra (with the option of adding the mention edge)
-                if (isFreshQuery) {
+                // 1. Asynchronous adding the book to the local
+                // TODO: Web updating ; [Also, if this is the best place to update local cache]
+                Toast.makeText(getApplicationContext(), "added", Toast.LENGTH_SHORT).show();
 
+                //adding book
+                BookRepository repository = new BookRepository((Application) getApplicationContext());
+                drawrite.booknet.model.OLBook OLbook = bookAdapter.getItem(position);
+                repository.insert(new Book(OLbook.getOpenLibraryId(),OLbook.getGoodReadsId(),
+                        OLbook.getTitle(),OLbook.getSubTitle(),OLbook.getAuthor(),OLbook.getPublisher(),
+                        OLbook.getPublishYear(),Integer.toString(OLbook.getNrPages())));
 
-                    // 1. Asynchronous adding the book to the local
-                    // TODO: Web updating ; [Also, if this is the best place to update local cache]
-                    Toast.makeText(getApplicationContext(), "added", Toast.LENGTH_SHORT).show();
+                // 1. Starting detail activity
+                Intent intent;
+                if(!isFreshQuery)
+                    intent  = new Intent(OLBookListActivity.this, BookDetailActivity.class);
+                else
+                    intent  = new Intent(OLBookListActivity.this, BookDetailActivityTabbed.class);
 
-                    BookRepository repository = new BookRepository((Application) getApplicationContext());
-                    drawrite.booknet.model.OLBook OLbook = bookAdapter.getItem(position);
-                    repository.insert(new Book(OLbook.getOpenLibraryId(),OLbook.getGoodReadsId(),
-                            OLbook.getTitle(),OLbook.getSubTitle(),OLbook.getAuthor(),OLbook.getPublisher(),
-                            OLbook.getPublishYear(),Integer.toString(OLbook.getNrPages())));
-
-
-                    // Starting detail activity
-                    Intent intent = new Intent(OLBookListActivity.this, BookDetailActivityTabbed.class);
-                    intent.putExtra(BOOK_DETAIL_KEY, bookAdapter.getItem(position));
+                intent.putExtra(BOOK_DETAIL_KEY, bookAdapter.getItem(position));
                     startActivity(intent);
-                }
-                else{ // we don't want to look at the detail of the new book.
-                    Log.d("OLBookListActivity", "not fresh query !");
 
-                    Intent replyIntent = new Intent();
-                    //[TODO] FIGURE the best place to update local store
-                    String bookName = bookAdapter.getItem(position).getTitle();
-                    replyIntent.putExtra("bookTitle",bookName);
-                    setResult(RESULT_OK,replyIntent);
-                    finish();
-                }
             }
         });
     }

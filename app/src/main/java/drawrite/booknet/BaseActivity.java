@@ -114,6 +114,7 @@ public class BaseActivity extends AppCompatActivity implements  NavigationView.O
         // TODO : find best way to call different activity or move to fragments ? Decide
         switch(menuItem.getItemId()){
             case R.id.nav_viewBook:
+
                 Toast.makeText(this, "view books", Toast.LENGTH_SHORT).show();
                 intent = new Intent(BaseActivity.this,ViewBookListActivity.class);
                 startActivity(intent);

@@ -120,7 +120,7 @@ public class SearchableActivity extends AppCompatActivity {
             // case 3
             // call OLBookList Activity
             Intent OLintent = new Intent(this, OLBookListActivity.class);
-            OLintent.putExtra("EXTRA_QUERY", query);
+            OLintent.putExtra(EXTRA_QUERY, query);
             startActivity(OLintent);
 
         }

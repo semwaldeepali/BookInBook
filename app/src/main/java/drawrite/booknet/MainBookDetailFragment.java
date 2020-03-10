@@ -2,6 +2,7 @@ package drawrite.booknet;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,6 +10,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -74,9 +76,14 @@ public class MainBookDetailFragment extends Fragment {
         tvSubTitle =  view.findViewById(R.id.tvSubTitle);
 
         // Use the book to populate the data into our views
-        OLBook book = (OLBook) getActivity().getIntent().getSerializableExtra(OLBookListActivity.BOOK_DETAIL_KEY);
-        loadBook(book);
+        Intent intent = getActivity().getIntent();
+        if(intent.getExtras()!=null) {
 
+            OLBook book = (OLBook) intent.getSerializableExtra(OLBookListActivity.BOOK_DETAIL_KEY);
+
+
+            loadBook(book);
+        }
         //TODO: Asynchronous update the local db
         return view;
     }
@@ -157,7 +164,6 @@ public class MainBookDetailFragment extends Fragment {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
 
             }
         }

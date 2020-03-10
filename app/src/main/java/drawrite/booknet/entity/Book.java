@@ -2,15 +2,19 @@ package drawrite.booknet.entity;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
 
 
-@Entity(tableName = "book_table") // table name convention as sql
+@Entity(tableName = "book_table", indices = {@Index(value =
+        {"book_ol_id"}, unique = true)}) // table name convention as sql
 public class Book {
 
     @PrimaryKey(autoGenerate = true)
     private int id;
 
+    @NonNull
     @ColumnInfo(name = "book_ol_id")
     private String olid;
 
