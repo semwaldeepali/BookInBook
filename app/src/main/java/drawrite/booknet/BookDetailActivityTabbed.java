@@ -14,10 +14,12 @@ import android.widget.Toast;
 import static drawrite.booknet.OLBookListActivity.IS_FRESH_QUERY;
 import static drawrite.booknet.SearchableActivity.EXTRA_QUERY;
 
-public class BookDetailActivityTabbed extends BaseActivity implements SearchDialog.SearchDialogListener{
+public class BookDetailActivityTabbed extends BaseActivity {
+
     private BookDetailTabAdapter adapter;
     private TabLayout tabLayout;
     private ViewPager viewPager;
+    public String mainBookOlId="";
 
     @Override
     protected void onCreate(Bundle saveInstanceState){
@@ -49,16 +51,6 @@ public class BookDetailActivityTabbed extends BaseActivity implements SearchDial
         return true;
     }
 
-    @Override
-    // Call the search activity here for searching with add link functionality
-    public void applyTexts(String bookName){
 
-        Intent OLintent = new Intent(this, OLBookListActivity.class);
-        OLintent.putExtra(EXTRA_QUERY, bookName);
-        OLintent.putExtra(IS_FRESH_QUERY,false);
-        startActivity(OLintent);
-        Toast.makeText(this, "got book name to search : " + bookName, Toast.LENGTH_SHORT).show();
-
-    }
 
 }

@@ -51,7 +51,7 @@ public class SearchDialog extends AppCompatDialogFragment {
         super.onAttach(context);
 
         try {
-            listener = (SearchDialogListener) context;
+            listener = (SearchDialogListener) getTargetFragment();
         } catch (ClassCastException e){
             throw new ClassCastException(context.toString() +
                     " must implement SearchDialogListener"

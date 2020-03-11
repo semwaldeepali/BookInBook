@@ -34,11 +34,20 @@ public class IsMentionedInFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Toast.makeText(getContext(), "this book is mentioned in ... book!!", Toast.LENGTH_SHORT).show();
-
+                // Resource : https://codinginflow.com/tutorials/android/custom-dialog-interface
+                // opens the search box for the book to be link
+                openSearchDialog();
             }
         });
 
         return view;
     }
+    public void openSearchDialog(){
+        Toast.makeText(getContext(), "search dialog opened ", Toast.LENGTH_SHORT).show();
+
+        SearchDialog searchDialog = new SearchDialog();
+        searchDialog.show(getChildFragmentManager(),"search dialog");
+    }
+
 
 }

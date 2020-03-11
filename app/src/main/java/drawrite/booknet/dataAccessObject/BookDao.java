@@ -25,7 +25,7 @@ public interface BookDao { // NOTE: interface because room will auto generate th
     // The default action is ABORT.
     // The default action is ABORT.
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE) //Maybe abort instead of replace else id will keep on increasing TODO
     void insertBook(Book book);
 
     @Delete
@@ -44,6 +44,10 @@ public interface BookDao { // NOTE: interface because room will auto generate th
     // NOTE: Simple query without parameters that returns values.
     @Query("SELECT * from book_table")
     LiveData<List<Book>> getAllBooks();
+
+    // Query to get book id corresponding to olid
+    @Query("SELECT id from book_table WHERE book_ol_id == :ol_id")
+    List<Integer> getBookId(String ol_id);
 
 
 }

@@ -41,4 +41,6 @@ public class BookViewModel extends AndroidViewModel {
     public LiveData<List<Book>> getAllBooks() {
         return allBooks;
     }
+
+    //public LiveData<List<String>> getBookId(String olId) { return repository.getBookId(olId); }
 }

@@ -21,7 +21,7 @@ import drawrite.booknet.model.Book;
 
 public class SearchableActivity extends AppCompatActivity {
 
-    public static final String EXTRA_QUERY = "";
+    public static final String EXTRA_QUERY = "extraQuery";
     //private BookAdapter adapter;
     private RecyclerView recyclerView;
 

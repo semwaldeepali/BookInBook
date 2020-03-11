@@ -1,6 +1,7 @@
 //normal book detail activity without tabs for adding book
 package drawrite.booknet;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -24,9 +25,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.concurrent.ExecutionException;
+
 import cz.msebera.android.httpclient.Header;
 import drawrite.booknet.apiClient.OLBookClient;
+import drawrite.booknet.dataAccessObject.BookDao;
+import drawrite.booknet.dataAccessObject.MentionsDao;
+import drawrite.booknet.entity.Book;
 import drawrite.booknet.model.OLBook;
+import drawrite.booknet.repository.BookRepository;
 
 public class BookDetailActivity extends BaseActivity {
 
@@ -46,8 +53,16 @@ public class BookDetailActivity extends BaseActivity {
 
     private OLBookClient client;
 
+    private String nrPagesInBook =""; // declared to take the value from nrPages in inner class
+    private String bookPublisher = "" ;
+    private String bookTitle = "";
+    private String subTitle = "";
+    private String author = "";
+    private String publishYear = "";
+    private String openLibraryId = "";
+    private String goodreadsId = "";
 
-
+    private String mainBookOlId = "";
 
 
     @Override
@@ -78,12 +93,11 @@ public class BookDetailActivity extends BaseActivity {
         // Use the book to populate the data into our views
         Intent intent = getIntent();
         if(intent.getExtras()!=null) {
-
             OLBook book = (OLBook) intent.getSerializableExtra(OLBookListActivity.BOOK_DETAIL_KEY);
-
+            mainBookOlId = intent.getStringExtra(OLBookListActivity.BOOKNET_MAIN_BOOK_OLID);
             loadBook(book);
+
         }
-        //TODO: Asynchronous update the local db
 
     }
 
@@ -94,10 +108,13 @@ public class BookDetailActivity extends BaseActivity {
         Context c = getApplicationContext(); // cannot directly set picasso without getting activity context
         Picasso.with(c).load(Uri.parse(book.getLargeCoverUrl())).error(R.drawable.ic_nocover).into(ivBookCover);
 
-        String bookTitle = book.getTitle();
-        String subTitle = book.getSubTitle();
-        String author = book.getAuthor();
-        String publishYear = book.getPublishYear();
+        bookTitle = book.getTitle();
+        subTitle = book.getSubTitle();
+        author = book.getAuthor();
+        publishYear = book.getPublishYear();
+        openLibraryId = book.getOpenLibraryId();
+        goodreadsId = book.getGoodReadsId();
+
 
         //update the book details whatever is present.
         if(!bookTitle.isEmpty() && bookTitle!=null)
@@ -137,9 +154,10 @@ public class BookDetailActivity extends BaseActivity {
                                 for (int i = 0; i < numPublishers; ++i) {
                                     publishers[i] = publisher.getString(i);
                                 }
-                                String pubList = TextUtils.join(", ", publishers);
-                                if(!pubList.isEmpty() && pubList!=null)
-                                    tvPublisher.setText(pubList);
+                                String publisherName = TextUtils.join(", ", publishers);
+                                BookDetailActivity.this.bookPublisher = publisherName;
+                                if(!publisherName.isEmpty() && publisherName!=null)
+                                    tvPublisher.setText(publisherName);
                                 else
                                 {
                                     tvPublishedByText.setVisibility(View.INVISIBLE);
@@ -150,6 +168,7 @@ public class BookDetailActivity extends BaseActivity {
                             }
                             if (response.has("number_of_pages")) {
                                 String nrPages = Integer.toString(response.getInt("number_of_pages")) ;
+                                BookDetailActivity.this.nrPagesInBook = nrPages;
                                 // TODO fix the pageCountText not getting invisible ... look for book : Grimms' Fairy Tales
                                 if(!nrPages.isEmpty() && nrPages!=null)
                                     tvPageCount.setText(nrPages + " pages") ;
@@ -167,11 +186,80 @@ public class BookDetailActivity extends BaseActivity {
                         btnAddLink.setVisibility(View.VISIBLE);
 
 
-                        //TODO : Add on click listener 070320
+
+
                         btnAddLink.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
                                 Toast.makeText(getBaseContext(), "Added book link", Toast.LENGTH_SHORT).show();
+                                // 1. Update the book db with new book.
+                                // 1.a Update Local db
+                                //adding book
+                                BookRepository repository = new BookRepository((Application) getApplicationContext());
+
+                                repository.insert(new Book(
+                                        BookDetailActivity.this.openLibraryId,
+                                        BookDetailActivity.this.goodreadsId,
+                                        BookDetailActivity.this.bookTitle,
+                                        BookDetailActivity.this.subTitle,
+                                        BookDetailActivity.this.author,
+                                        BookDetailActivity.this.bookPublisher,
+                                        BookDetailActivity.this.publishYear,
+                                        BookDetailActivity.this.nrPagesInBook));
+                                // TODO 1.b Update web db
+
+                                //TODO Start here some error when clicking add link
+
+                                // 2. Add the link into mentions table.
+                                // Algo : 1. get main book id
+                                //        2. get mentioned book id
+                                //        3. Update the mentions db for the [main, mentioned] case
+                                // TODO : Going ahead assuming only "mentions edge"
+                                //        see for more detail BookDetailedActivityTabbed
+
+                                // 1. get main book id
+                                Integer mainBookId = -1;
+                                try {
+                                    // Check if null output
+                                    // clean up accesing bookid multiple times
+                                    mainBookId = repository.getBookId(BookDetailActivity.this.mainBookOlId).get(0);
+                                    Toast.makeText(getBaseContext(), "Found the id for "+ BookDetailActivity.this.mainBookOlId  + ": " + mainBookId, Toast.LENGTH_SHORT).show();
+
+                                }
+                                catch (ExecutionException e){
+                                    // Handle exception
+
+                                }
+                                catch (InterruptedException e){
+
+                                }
+
+
+                                // 2. get mentioned book id
+
+                                //TODO : START HERE add function for getting primary id corresponding to olid from book_table
+                                Integer mentionedBookId = -1;
+                                 try {
+                                     // Check if null output
+                                     // clean up accesing bookid multiple times
+                                     mentionedBookId = repository.getBookId(BookDetailActivity.this.openLibraryId).get(0);
+                                     Toast.makeText(getBaseContext(), "Found the id for "+ BookDetailActivity.this.openLibraryId  + ": " + mentionedBookId, Toast.LENGTH_SHORT).show();
+
+                                 }
+                                 catch (ExecutionException e){
+                                     // Handle exception
+
+                                 }
+                                 catch (InterruptedException e){
+
+                                 }
+
+
+
+
+
+
+
 
                             }
                             //TODO : [8March start here] updating books links in db local/web

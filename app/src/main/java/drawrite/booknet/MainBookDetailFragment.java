@@ -7,12 +7,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.squareup.picasso.Picasso;
@@ -47,6 +49,12 @@ public class MainBookDetailFragment extends Fragment {
     private TextView tvPageCount;
 
     private OLBookClient client;
+
+    // variable for accesing mainBookOlId variable common across fragments.
+    private BookDetailActivityTabbed mainBookDetailActivity;
+
+    private String mainBoolOlIdMain;
+
     public MainBookDetailFragment() {
         // Required empty public constructor
     }
@@ -55,6 +63,11 @@ public class MainBookDetailFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        //getting the reference to the main activity which contain this fragment.
+        mainBookDetailActivity = (BookDetailActivityTabbed) getActivity();
+
+
 
         // Inflate the layout for this fragment
         view =  inflater.inflate(R.layout.fragment_main_book_detail, container, false);
@@ -95,10 +108,15 @@ public class MainBookDetailFragment extends Fragment {
         Context c = getActivity().getApplicationContext(); // cannot directly set picasso without getting activity context
         Picasso.with(c).load(Uri.parse(book.getLargeCoverUrl())).error(R.drawable.ic_nocover).into(ivBookCover);
 
+        //setting the mainBookId variable of the parent activity.
+        mainBookDetailActivity.mainBookOlId = book.getOpenLibraryId();
+        Toast.makeText(getContext(), "set main book ol id : " + mainBookDetailActivity.mainBookOlId, Toast.LENGTH_SHORT).show();
+        Log.d("MainBookDetailFragment", " 1103 set main book ol id : " + mainBookDetailActivity.mainBookOlId);
         String bookTitle = book.getTitle();
         String subTitle = book.getSubTitle();
         String author = book.getAuthor();
         String publishYear = book.getPublishYear();
+
 
         //update the book details whatever is present.
         if(!bookTitle.isEmpty() && bookTitle!=null)
