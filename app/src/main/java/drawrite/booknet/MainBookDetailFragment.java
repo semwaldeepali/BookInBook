@@ -1,6 +1,7 @@
 package drawrite.booknet;
 
 
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -24,9 +25,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
 
+import java.util.concurrent.ExecutionException;
+
 import cz.msebera.android.httpclient.Header;
 import drawrite.booknet.apiClient.OLBookClient;
 import drawrite.booknet.model.OLBook;
+import drawrite.booknet.repository.BookRepository;
 
 
 /**
@@ -65,6 +69,7 @@ public class MainBookDetailFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         //getting the reference to the main activity which contain this fragment.
+        // For variable sharing purpose
         mainBookDetailActivity = (BookDetailActivityTabbed) getActivity();
 
 
@@ -112,6 +117,25 @@ public class MainBookDetailFragment extends Fragment {
         mainBookDetailActivity.mainBookOlId = book.getOpenLibraryId();
         Toast.makeText(getContext(), "set main book ol id : " + mainBookDetailActivity.mainBookOlId, Toast.LENGTH_SHORT).show();
         Log.d("MainBookDetailFragment", " 1103 set main book ol id : " + mainBookDetailActivity.mainBookOlId);
+
+        // Making a DB Query to get mainBook Primary Id
+        {
+            BookRepository repository = new BookRepository((Application) getActivity().getApplicationContext());
+
+            try {
+                // Check if null output
+                // clean up accesing bookid multiple times
+                mainBookDetailActivity.mainBookPrimaryId = repository.getBookId(book.getOpenLibraryId()).get(0);
+                Log.d("MainBookDetailFragment", " 1103 set main book ol id : " + mainBookDetailActivity.mainBookPrimaryId);
+
+            } catch (ExecutionException e) {
+                // Handle exception
+
+            } catch (InterruptedException e) {
+
+            }
+        }
+
         String bookTitle = book.getTitle();
         String subTitle = book.getSubTitle();
         String author = book.getAuthor();

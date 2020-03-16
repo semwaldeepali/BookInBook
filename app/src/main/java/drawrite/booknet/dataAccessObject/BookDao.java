@@ -25,7 +25,7 @@ public interface BookDao { // NOTE: interface because room will auto generate th
     // The default action is ABORT.
     // The default action is ABORT.
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE) //Maybe abort instead of replace else id will keep on increasing TODO
+    @Insert(onConflict = OnConflictStrategy.IGNORE) //if already exist donot replace as primary id will keep on incrementing
     void insertBook(Book book);
 
     @Delete
@@ -46,8 +46,12 @@ public interface BookDao { // NOTE: interface because room will auto generate th
     LiveData<List<Book>> getAllBooks();
 
     // Query to get book id corresponding to olid
-    @Query("SELECT id from book_table WHERE book_ol_id == :ol_id")
+    @Query("SELECT id from book_table WHERE book_ol_id = :ol_id") //single = sign
     List<Integer> getBookId(String ol_id);
+
+    // Get list of books based on primary id
+    @Query("SELECT * from book_table WHERE id = :primaryId")
+    LiveData<List<Book>> getBookByPID(Integer primaryId);
 
 
 }

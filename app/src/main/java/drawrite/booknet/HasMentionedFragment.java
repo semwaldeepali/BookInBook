@@ -1,16 +1,32 @@
 package drawrite.booknet;
 
 
+import android.app.Application;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+
+import drawrite.booknet.entity.Book;
+import drawrite.booknet.repository.BookRepository;
+import drawrite.booknet.repository.MentionsRepository;
+import drawrite.booknet.viewModel.BookViewModel;
+
+import static drawrite.booknet.OLBookListActivity.BOOKNET_MAIN_BOOK_OLID;
+import static drawrite.booknet.OLBookListActivity.BOOKNET_MAIN_BOOK_PID;
 import static drawrite.booknet.OLBookListActivity.IS_FRESH_QUERY;
 import static drawrite.booknet.SearchableActivity.EXTRA_QUERY;
 
@@ -20,7 +36,7 @@ import static drawrite.booknet.SearchableActivity.EXTRA_QUERY;
  */
 public class HasMentionedFragment extends Fragment implements SearchDialog.SearchDialogListener {
 
-    public static final String BOOKNET_MAIN_BOOK_OLID = "";
+
 
     public HasMentionedFragment() {
         // Required empty public constructor
@@ -30,6 +46,8 @@ public class HasMentionedFragment extends Fragment implements SearchDialog.Searc
     private BookDetailActivityTabbed mainBookDetailActivity;
 
     private String mainBoolOlIdHas;
+    private List<Integer> mentionedBookIdsList;
+    private BookViewModel bookViewModel;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -40,8 +58,23 @@ public class HasMentionedFragment extends Fragment implements SearchDialog.Searc
         mainBoolOlIdHas =  mainBookDetailActivity.mainBookOlId;
 
 
+
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_has_mentioned, container, false);
+
+        RecyclerView recyclerView = view.findViewById(R.id.has_recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setHasFixedSize(true); //makes something done under the hood efficient
+
+        final BookAdapter adapter = new BookAdapter();
+        recyclerView.setAdapter(adapter);
+
+        // TODO show the list of mentions books from the Mentions db [START]
+        //Approach : 1. Query for main book primary id [instead of olid send primary id of main book; will save extra query]
+        //           2. Query mentions db to get pairs
+        //           3. Query books db to get list of books
+        //           4. Display the list of books
+
         FloatingActionButton fab = view.findViewById(R.id.fab_hm);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,6 +89,57 @@ public class HasMentionedFragment extends Fragment implements SearchDialog.Searc
 
             }
         });
+
+        // TODO show the list of mentions books from the Mentions db [START]
+        //Approach : 1. Query for main book primary id [instead of olid send primary id of main book; will save extra query]
+        //           2. Query mentions db to get pairs
+        //           3. Query books db to get list of books
+        //           4. Display the list of books
+
+        //3. a. Query db to fetch mentioned book ids
+        MentionsRepository mentionsRepository = new MentionsRepository((Application) getActivity().getApplicationContext());
+        try {
+            // Check if null output
+            // clean up accesing bookid multiple times
+            mentionedBookIdsList = mentionsRepository.getMentionsByBookIds(mainBookDetailActivity.mainBookPrimaryId);
+            Log.d("HasMentionedFragment", "1103 retrieved mentioned book ids   " + mentionedBookIdsList.size() );
+
+        }
+        catch (ExecutionException e){
+            // Handle exception
+
+        }
+        catch (InterruptedException e){
+
+        }
+        // 3.b Fetch the detail for books from main db
+        if(mentionedBookIdsList!=null){
+
+            // Gets the view model access as per the android
+            bookViewModel = ViewModelProviders.of(this).get(BookViewModel.class);
+
+
+            for (int i=0; i<mentionedBookIdsList.size(); i++) {
+                Log.d("HasMentionedFragment", "1103 looping through book id list  " + i );
+
+                // observer of the live data
+                bookViewModel.getBookByPID(mentionedBookIdsList.get(i)).observe(this, new Observer<List<Book>>(){
+                    @Override
+                    public void onChanged(@Nullable List<Book> books) {
+                        adapter.setBooks(books);
+                    }
+
+
+                });
+
+
+            }
+
+
+
+
+        }
+
         return  view;
     }
     public void openSearchDialog(){
@@ -80,9 +164,12 @@ public class HasMentionedFragment extends Fragment implements SearchDialog.Searc
         // Approach 1: [Dirty] Duplicate the search dialog & book detail activity
         OLintent.putExtra(IS_FRESH_QUERY,false);
         OLintent.putExtra(BOOKNET_MAIN_BOOK_OLID,mainBoolOlIdHas);
+        OLintent.putExtra(BOOKNET_MAIN_BOOK_PID,mainBookDetailActivity.mainBookPrimaryId);
+
         Log.d("HasMentionedFragment", "1103 is fresh query ?  false " );
         Log.d("HasMentionedFragment", "1103 query book name   " + bookName);
         Log.d("HasMentionedFragment", "1103 main book ol id   " + mainBoolOlIdHas);
+        Log.d("HasMentionedFragment", "1103 main book primary id   " + mainBookDetailActivity.mainBookPrimaryId);
 
 
         startActivity(OLintent);

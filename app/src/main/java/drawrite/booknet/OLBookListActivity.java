@@ -37,9 +37,12 @@ public class OLBookListActivity extends BaseActivity {
     public static final String BOOK_DETAIL_KEY = "Book";
     public static final String IS_FRESH_QUERY = "IsFreshQuery";
     public static final String BOOKNET_MAIN_BOOK_OLID = "booknetMainBookOlId";
+    public static final String BOOKNET_MAIN_BOOK_PID = "booknetMainBookPrimaryId";
+
 
     private boolean isFreshQuery ;
     private String mainBookOlId;
+    private Integer mainBookPrimaryId;
     private ListView lvBooks;
     private OLBookAdapter bookAdapter;
     private OLBookClient client;
@@ -66,6 +69,10 @@ public class OLBookListActivity extends BaseActivity {
         //get the main book id if not fresh query
         mainBookOlId = intent.getStringExtra(BOOKNET_MAIN_BOOK_OLID);
         Log.d("OLBookListActivity", "1103 got main book id ! " + mainBookOlId);
+
+        mainBookPrimaryId = intent.getIntExtra(BOOKNET_MAIN_BOOK_PID,-1);
+        Log.d("OLBookListActivity", "1103 got main book id ! " + mainBookPrimaryId);
+
 
         //fetch books remotely TODO move to asynchronous thread [?]
         fetchBooks(query);
@@ -150,8 +157,10 @@ public class OLBookListActivity extends BaseActivity {
                 // 1. Starting detail activity
                 Intent intent;
                 if(!isFreshQuery) {
+
                     intent = new Intent(OLBookListActivity.this, BookDetailActivity.class);
                     intent.putExtra(BOOKNET_MAIN_BOOK_OLID,mainBookOlId);
+                    intent.putExtra(BOOKNET_MAIN_BOOK_PID,mainBookPrimaryId);
                 }
                     else
                     intent  = new Intent(OLBookListActivity.this, BookDetailActivityTabbed.class);

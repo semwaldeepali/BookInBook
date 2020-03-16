@@ -20,6 +20,7 @@ public class BookDetailActivityTabbed extends BaseActivity {
     private TabLayout tabLayout;
     private ViewPager viewPager;
     public String mainBookOlId="";
+    public Integer mainBookPrimaryId = -1;
 
     @Override
     protected void onCreate(Bundle saveInstanceState){

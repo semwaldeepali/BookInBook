@@ -13,6 +13,7 @@
     android:padding="8dp"
     android:orientation="vertical">
 
+    <!-- adding to check if primary ids are present in book entity -->
 
     <ImageView
         android:id="@+id/ivBookCover"
@@ -40,6 +41,17 @@
         android:layout_toRightOf="@+id/ivBookCover"
         android:layout_below="@+id/tvTitle"
         android:text="Author"
+        android:ellipsize="end"
+        android:maxLines="1"
+        />
+    <TextView
+        android:id="@+id/tvPrimaryId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_toRightOf="@+id/ivBookCover"
+        android:layout_below="@+id/tvAuthor"
+        android:text="Primary id"
         android:ellipsize="end"
         android:maxLines="1"
         />

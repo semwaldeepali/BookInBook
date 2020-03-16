@@ -32,8 +32,10 @@ import drawrite.booknet.apiClient.OLBookClient;
 import drawrite.booknet.dataAccessObject.BookDao;
 import drawrite.booknet.dataAccessObject.MentionsDao;
 import drawrite.booknet.entity.Book;
+import drawrite.booknet.entity.Mentions;
 import drawrite.booknet.model.OLBook;
 import drawrite.booknet.repository.BookRepository;
+import drawrite.booknet.repository.MentionsRepository;
 
 public class BookDetailActivity extends BaseActivity {
 
@@ -63,6 +65,8 @@ public class BookDetailActivity extends BaseActivity {
     private String goodreadsId = "";
 
     private String mainBookOlId = "";
+    private Integer mainBookPrimaryId = -1;
+    private Integer mentionBookPrimaryId = -1;
 
 
     @Override
@@ -95,8 +99,56 @@ public class BookDetailActivity extends BaseActivity {
         if(intent.getExtras()!=null) {
             OLBook book = (OLBook) intent.getSerializableExtra(OLBookListActivity.BOOK_DETAIL_KEY);
             mainBookOlId = intent.getStringExtra(OLBookListActivity.BOOKNET_MAIN_BOOK_OLID);
+            mainBookPrimaryId = intent.getIntExtra(OLBookListActivity.BOOKNET_MAIN_BOOK_PID,-1);
             loadBook(book);
 
+            // 1. Update the book db with new book.
+            // 1.a Update Local db
+            //adding book
+            BookRepository repository = new BookRepository((Application) getApplicationContext());
+
+            repository.insert(new Book(
+                    BookDetailActivity.this.openLibraryId,
+                    BookDetailActivity.this.goodreadsId,
+                    BookDetailActivity.this.bookTitle,
+                    BookDetailActivity.this.subTitle,
+                    BookDetailActivity.this.author,
+                    BookDetailActivity.this.bookPublisher,
+                    BookDetailActivity.this.publishYear,
+                    BookDetailActivity.this.nrPagesInBook));
+            // TODO 1.b Update web db
+
+            //TODO Start here some error when clicking add link
+
+            // 2. Add the link into mentions table.
+            // Algo : 1. get main book id
+            //        2. get mentioned book id
+            //        3. Update the mentions db for the [main, mentioned] case
+            // TODO : Going ahead assuming only "mentions edge"
+            //        see for more detail BookDetailedActivityTabbed
+
+            // 1. get main book id
+
+            // 2. get mentioned book id
+            // TODO : Check if I get get primary id for mentioned book when it is getting added
+
+            try {
+                // Check if null output
+                // clean up accesing bookid multiple times
+                mentionBookPrimaryId = repository.getBookId(BookDetailActivity.this.openLibraryId).get(0);
+                Log.d("BookDetailActivity", " 1103 found  the primary id is valid: main " + mainBookPrimaryId +" or mentioned : "+mentionBookPrimaryId);
+
+            }
+            catch (ExecutionException e){
+                // Handle exception
+                Log.d("BookDetailActivity", " 1103 Execution exception " + e);
+
+            }
+            catch (InterruptedException e){
+                Log.d("BookDetailActivity", " 1103 Interrupt exception " + e);
+
+
+            }
         }
 
     }
@@ -139,6 +191,36 @@ public class BookDetailActivity extends BaseActivity {
             tvPublishedByYearText.setVisibility(View.INVISIBLE);
             tvPublishYear.setVisibility(View.INVISIBLE);
         }
+
+
+        btnAddLink.setVisibility(View.VISIBLE);
+        btnAddLink.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //TODO : why restarting the activity with fresh search
+                Toast.makeText(getBaseContext(), "Added book link", Toast.LENGTH_SHORT).show();
+                Log.d("BookDetailActivity", " 1103 clicked the add link ");
+                //3.Update the mentions db for the [main, mentioned] case
+                if(mainBookPrimaryId!=-1 && mentionBookPrimaryId!=-1)
+                {
+                    Log.d("BookDetailActivity", " 1103 either of the primary id is valid: main " + mainBookPrimaryId +" or mentioned : "+mentionBookPrimaryId);
+
+                    Mentions mentionPair = new Mentions(mainBookPrimaryId,mentionBookPrimaryId);
+                    MentionsRepository mentionsRepository = new MentionsRepository((Application) getApplicationContext());
+                    mentionsRepository.insert(mentionPair);
+                    Log.d("BookDetailActivity", " 1103 Instertion initiated for mentions");
+                }
+                else {
+                    Log.d("BookDetailActivity", " 1103 either of the primary id is not valid: main " + mainBookPrimaryId +" or mentioned : "+mentionBookPrimaryId);
+
+
+                }
+
+
+
+            }
+
+        });
 
         // fetch extra book data from books API
         client = new OLBookClient();
@@ -183,87 +265,11 @@ public class BookDetailActivity extends BaseActivity {
                             e.printStackTrace();
                         }
 
-                        btnAddLink.setVisibility(View.VISIBLE);
-
-
-
-
-                        btnAddLink.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                Toast.makeText(getBaseContext(), "Added book link", Toast.LENGTH_SHORT).show();
-                                // 1. Update the book db with new book.
-                                // 1.a Update Local db
-                                //adding book
-                                BookRepository repository = new BookRepository((Application) getApplicationContext());
-
-                                repository.insert(new Book(
-                                        BookDetailActivity.this.openLibraryId,
-                                        BookDetailActivity.this.goodreadsId,
-                                        BookDetailActivity.this.bookTitle,
-                                        BookDetailActivity.this.subTitle,
-                                        BookDetailActivity.this.author,
-                                        BookDetailActivity.this.bookPublisher,
-                                        BookDetailActivity.this.publishYear,
-                                        BookDetailActivity.this.nrPagesInBook));
-                                // TODO 1.b Update web db
-
-                                //TODO Start here some error when clicking add link
-
-                                // 2. Add the link into mentions table.
-                                // Algo : 1. get main book id
-                                //        2. get mentioned book id
-                                //        3. Update the mentions db for the [main, mentioned] case
-                                // TODO : Going ahead assuming only "mentions edge"
-                                //        see for more detail BookDetailedActivityTabbed
-
-                                // 1. get main book id
-                                Integer mainBookId = -1;
-                                try {
-                                    // Check if null output
-                                    // clean up accesing bookid multiple times
-                                    mainBookId = repository.getBookId(BookDetailActivity.this.mainBookOlId).get(0);
-                                    Toast.makeText(getBaseContext(), "Found the id for "+ BookDetailActivity.this.mainBookOlId  + ": " + mainBookId, Toast.LENGTH_SHORT).show();
-
-                                }
-                                catch (ExecutionException e){
-                                    // Handle exception
-
-                                }
-                                catch (InterruptedException e){
-
-                                }
-
-
-                                // 2. get mentioned book id
-
-                                //TODO : START HERE add function for getting primary id corresponding to olid from book_table
-                                Integer mentionedBookId = -1;
-                                 try {
-                                     // Check if null output
-                                     // clean up accesing bookid multiple times
-                                     mentionedBookId = repository.getBookId(BookDetailActivity.this.openLibraryId).get(0);
-                                     Toast.makeText(getBaseContext(), "Found the id for "+ BookDetailActivity.this.openLibraryId  + ": " + mentionedBookId, Toast.LENGTH_SHORT).show();
-
-                                 }
-                                 catch (ExecutionException e){
-                                     // Handle exception
-
-                                 }
-                                 catch (InterruptedException e){
-
-                                 }
 
 
 
 
 
-
-
-
-                            }
-                            //TODO : [8March start here] updating books links in db local/web
-                        });
 
                     }
                 }

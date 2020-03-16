@@ -6,6 +6,7 @@ import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
+//testing this : all int as the foreign keys from book is int auto increment primary key
 
 // mentions_book_id is the one that is mentioned within main_book_id
 @Entity(tableName = "mentions_table",primaryKeys = {"main_book_id","mentions_book_id"},
@@ -21,30 +22,30 @@ import android.support.annotation.NonNull;
 public class Mentions {
 
     @ColumnInfo(name = "main_book_id")
-    @NonNull private String mainId;
+    @NonNull private int mainId;
 
     @ColumnInfo(name = "mentions_book_id")
-    @NonNull private String mentionsId;
+    @NonNull private int mentionsId;
 
     //constructor
-    public Mentions(String mainId, String mentionsId) {
+    public Mentions(int mainId, int mentionsId) { //TODO fix the id's data type. If char possible
         this.mainId = mainId;
         this.mentionsId = mentionsId;
     }
 
-    public String getMainId() {
+    public int getMainId() {
         return mainId;
     }
 
-    public String getMentionsId() {
+    public int getMentionsId() {
         return mentionsId;
     }
 
-    public void setMainId(String mainId) {
+    public void setMainId(int mainId) {
         this.mainId = mainId;
     }
 
-    public void setMentionsId(String mentionsId) {
+    public void setMentionsId(int mentionsId) {
         this.mentionsId = mentionsId;
     }
 }

@@ -122,6 +122,9 @@ public class BaseActivity extends AppCompatActivity implements  NavigationView.O
 
             case R.id.nav_addBook:
                 Toast.makeText(this, "add book", Toast.LENGTH_SHORT).show();
+                //TODO temp addition
+                intent = new Intent(BaseActivity.this,TestViewMentionsListActivity.class);
+                startActivity(intent);
                 break;
             case R.id.nav_profile:
                 Toast.makeText(this, "profile", Toast.LENGTH_SHORT).show();

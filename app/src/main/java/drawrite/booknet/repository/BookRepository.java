@@ -15,7 +15,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import drawrite.booknet.dataAccessObject.BookDao;
-import drawrite.booknet.database.BookDatabase;
+import drawrite.booknet.database.BookNetDatabase;
 import drawrite.booknet.entity.Book;
 
 public class BookRepository {
@@ -25,12 +25,12 @@ public class BookRepository {
     private LiveData<List<Book>> allBooks;
 
     public BookRepository(Application application){
-        BookDatabase database = BookDatabase.getInstance(application);
+        BookNetDatabase database = BookNetDatabase.getInstance(application);
         bookDao = database.bookDao();
         allBooks = bookDao.getAllBooks();
     }
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     public void insert(Book book){
         new InsertBookAsyncTask(bookDao).execute(book);
 
@@ -45,9 +45,17 @@ public class BookRepository {
         new DeleteBookAsyncTask(bookDao).execute();
     }
 
+
+    public LiveData<List<Book>> getBookByPID(Integer mainBookPrimaryId){
+        return  bookDao.getBookByPID(mainBookPrimaryId);
+    }
+
     public LiveData<List<Book>> getAllBooks() {
         return allBooks;
     }
+
+    // Get list of books based on primary id
+
 
     // Livedata to reflect any change in db ;
     // [Not working]Doing this as we cannot return result from asyncTask thread to main thread
@@ -68,36 +76,9 @@ public class BookRepository {
         return future.get();
     }
 
-    /*private static class GetBookIdAsyncTask extends AsyncTask<String, Void, List<String>>{
-        private BookDao bookDao;
 
-        public interface AsyncResponse {
-            void processFinish(List<String> output);
-        }
 
-        public AsyncResponse delegate = null;
 
-        public GetBookIdAsyncTask(AsyncResponse delegate){
-            this.delegate = delegate;
-        }
-
-        private GetBookIdAsyncTask(BookDao bookDao){
-            this.bookDao = bookDao;
-        }
-
-        @Override
-        protected List<String> doInBackground(String... olId){
-
-            return bookDao.getBookId(olId[0]);
-        }
-
-        // for asyncResponse handling back to main UI
-        @Override
-        protected void onPostExecute(List<String> result) {
-            delegate.processFinish(result);
-        }
-    }
- */
     private static class InsertBookAsyncTask extends AsyncTask<Book, Void, Void>{
         private BookDao bookDao;
 

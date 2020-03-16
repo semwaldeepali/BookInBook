@@ -34,6 +34,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookHolder> {
         Book currentBook = books.get(position);
         holder.title.setText(currentBook.getTitle());
         holder.author.setText(currentBook.getAuthor());
+        holder.primaryId.setText(String.valueOf(currentBook.getId()));
 
     }
 
@@ -52,12 +53,15 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookHolder> {
         public final View mView;
         TextView title;
         TextView author;
+        TextView primaryId;
+
 
         BookHolder(View itemView){
             super(itemView);
             mView = itemView;
             title = mView.findViewById(R.id.tvTitle);
             author = mView.findViewById(R.id.tvAuthor);
+            primaryId = mView.findViewById(R.id.tvPrimaryId);
 
         }
     }

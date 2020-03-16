@@ -3,12 +3,17 @@ package drawrite.booknet.repository;
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import drawrite.booknet.dataAccessObject.MentionsDao;
 
-import drawrite.booknet.database.MentionsDatabase;
+import drawrite.booknet.database.BookNetDatabase;
 import drawrite.booknet.entity.Mentions;
 
 public class MentionsRepository {
@@ -18,12 +23,30 @@ public class MentionsRepository {
     private LiveData<List<Mentions>> allMentions;
 
     public MentionsRepository(Application application){
-        MentionsDatabase database = MentionsDatabase.getInstance(application);
+        BookNetDatabase database = BookNetDatabase.getInstance(application);
         mentionsDao = database.mentionsDao();
         allMentions = mentionsDao.getAllMentions();
     }
 
+    // Approach 3 : Using Callable and Futures ; Source https://stackoverflow.com/questions/51013167/room-cannot-access-database-on-the-main-thread-since-it-may-potentially-lock-th
+
+    public List<Integer> getMentionsByBookIds(final Integer mainBookId) throws ExecutionException, InterruptedException {
+
+        Callable<List<Integer>> callable = new Callable<List<Integer>>() {
+            @Override
+            public List<Integer> call() throws Exception {
+                return mentionsDao.getMentionsByBookIds(mainBookId);
+            }
+        };
+
+        Future<List<Integer>> future = Executors.newSingleThreadExecutor().submit(callable);
+
+        return future.get();
+    }
+
     public void insert(Mentions mentions){
+        Log.d("MentionsRepository", " 1103 insert being executed: main " + mentions.getMainId() +" or mentioned : "+mentions.getMentionsId());
+
         new InsertMentionsAsyncTask(mentionsDao).execute(mentions);
 
     }
@@ -49,6 +72,8 @@ public class MentionsRepository {
         }
         @Override
         protected Void doInBackground(Mentions... mentions){
+            Log.d("MentionsRepository", " 1103 insert mention async task being executed: main " + mentions[0].getMainId() +" or mentioned : "+mentions[0].getMentionsId());
+
             mentionsDao.insertMentions(mentions[0]);
             return null;
         }

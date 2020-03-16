@@ -54,6 +54,10 @@
             android:launchMode="singleTop">
 
         </activity>
+        <activity android:name=".TestViewMentionsListActivity"
+            android:launchMode="singleTop">
+
+        </activity>
 
         <!-- Points to searchable activity so the whole app can invoke search. -->
         <meta-data

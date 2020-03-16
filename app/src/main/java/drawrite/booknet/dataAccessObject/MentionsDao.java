@@ -25,7 +25,7 @@ public interface MentionsDao { // NOTE: interface because room will auto generat
     // if there is an existing entry.
     // The default action is ABORT.
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE) // id already exist don't replace
     void insertMentions(Mentions mentions);
 
     @Delete
@@ -44,6 +44,11 @@ public interface MentionsDao { // NOTE: interface because room will auto generat
     // NOTE: Simple query without parameters that returns values.
     @Query("SELECT * from mentions_table")
     LiveData<List<Mentions>> getAllMentions();
+
+    //Get the mentions based on main_book_id
+    @Query("SELECT mentions_book_id from mentions_table where main_book_id == :mainBookId")
+    List<Integer> getMentionsByBookIds(Integer mainBookId);
+
 
 
 }
