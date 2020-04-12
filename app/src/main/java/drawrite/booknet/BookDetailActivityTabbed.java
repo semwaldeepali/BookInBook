@@ -6,36 +6,73 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.support.v7.widget.SearchView;
-import android.widget.Toast;
-
-import static drawrite.booknet.OLBookListActivity.IS_FRESH_QUERY;
-import static drawrite.booknet.SearchableActivity.EXTRA_QUERY;
+import android.widget.TextView;
 
 public class BookDetailActivityTabbed extends BaseActivity {
 
     private BookDetailTabAdapter adapter;
     private TabLayout tabLayout;
     private ViewPager viewPager;
-    public String mainBookOlId="";
-    public Integer mainBookPrimaryId = -1;
+    public String detailedBookOlId="";
+    public Integer detailedBookPrimaryId = -1;
+
+
+
+    public TextView tvBookTitle;
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d("BookDetailActivityTabed"," Active");
+
+    }
+
 
     @Override
     protected void onCreate(Bundle saveInstanceState){
         super.onCreate(saveInstanceState);
         setContentView(R.layout.book_detail_activity);
+        tvBookTitle = findViewById(R.id.tvBookTopTitle);
         viewPager = findViewById(R.id.viewPager);
         tabLayout = findViewById(R.id.tabLayout);
         adapter = new BookDetailTabAdapter(getSupportFragmentManager());
-        adapter.addFragment(new IsMentionedInFragment(),"IsMentionedIn");
-        adapter.addFragment(new MainBookDetailFragment(),"Book Detail");
-        adapter.addFragment(new HasMentionedFragment(),"Has Mentioned");
+        adapter.addFragment(new FragmentOuterBooks(),"Outer Books");
+        adapter.addFragment(new FragmentDetailedBook(),"Book Detail");
+        adapter.addFragment(new FragmentInnerBooks(),"Inner Books");
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
         viewPager.setCurrentItem(1); // for setting the default tab
     }
+
+    //onNewIntent triggered when data called from the same activity
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        detailedBookPrimaryId = -1;
+        detailedBookOlId="";
+        Log.d("BOOKDETAILACTIVITY", "1103 OnNewIntent reseting !");
+
+
+        //tvBookTitle = findViewById(R.id.tvBookDetailTitle);
+        //tvBookTitle.setText(detailedBookTitle);
+        viewPager = findViewById(R.id.viewPager);
+        tabLayout = findViewById(R.id.tabLayout);
+        adapter = new BookDetailTabAdapter(getSupportFragmentManager());
+        adapter.addFragment(new FragmentOuterBooks(),"Outer Books");
+        adapter.addFragment(new FragmentDetailedBook(),"Book Detail");
+        adapter.addFragment(new FragmentInnerBooks(),"Inner Books");
+        viewPager.setAdapter(adapter);
+        tabLayout.setupWithViewPager(viewPager);
+        viewPager.setCurrentItem(1); // for setting the default tab*/
+    }
+
+
+
 
     // inflating the search option
     @Override

@@ -1,6 +1,7 @@
 package drawrite.booknet;
 // this activity implements the toolbar to be used across all the app activities
-// TODO: Add home button ; fix the toolbar look;
+
+// TODO.V2 : Missing back button. Not needed as Single all navigations are single top.
 
 import android.app.SearchManager;
 import android.content.Context;
@@ -25,12 +26,18 @@ import android.widget.Toast;
 public class BaseActivity extends AppCompatActivity implements  NavigationView.OnNavigationItemSelectedListener{
 
     private DrawerLayout drawer;
+    private ActionBarDrawerToggle mDrawerToggle ;
 
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d("BaseActivity"," Active");
+
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
 
     }
 
@@ -44,6 +51,13 @@ public class BaseActivity extends AppCompatActivity implements  NavigationView.O
         }else{
             super.onBackPressed();
         }
+    }
+
+
+    @Override
+    public void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mDrawerToggle.syncState();
     }
 
 
@@ -69,16 +83,14 @@ public class BaseActivity extends AppCompatActivity implements  NavigationView.O
         NavigationView navigationView = findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        //adding the hamburger icon with animation using the toggle library.
-
-        //TODO : Fix the hamburger icon
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this,drawer,
+        //adding the hamburger icon with animation using the toggle library
+        mDrawerToggle = new ActionBarDrawerToggle(this,drawer, toolbar,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
+        drawer.addDrawerListener(mDrawerToggle);
 
         Log.d("BaseActivity","onCreateFunction; putting up the hamburger");
 
-        toggle.syncState();
+        //mDrawerToggle.syncState();
 
     }
 
@@ -111,21 +123,21 @@ public class BaseActivity extends AppCompatActivity implements  NavigationView.O
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
 
         Intent intent;
-        // TODO : find best way to call different activity or move to fragments ? Decide
+        // TODO.V2 : find best way to call different activity or move to fragments ? Decide
+
         switch(menuItem.getItemId()){
             case R.id.nav_viewBook:
-
-                Toast.makeText(this, "view books", Toast.LENGTH_SHORT).show();
+                drawer.closeDrawer(GravityCompat.START);
                 intent = new Intent(BaseActivity.this,ViewBookListActivity.class);
                 startActivity(intent);
                 break;
 
-            case R.id.nav_addBook:
-                Toast.makeText(this, "add book", Toast.LENGTH_SHORT).show();
-                //TODO temp addition
-                intent = new Intent(BaseActivity.this,TestViewMentionsListActivity.class);
+            case R.id.nav_Home:
+                drawer.closeDrawer(GravityCompat.START);
+                intent = new Intent(BaseActivity.this,MainActivity.class);
                 startActivity(intent);
                 break;
+            /*
             case R.id.nav_profile:
                 Toast.makeText(this, "profile", Toast.LENGTH_SHORT).show();
                 break;
@@ -134,7 +146,7 @@ public class BaseActivity extends AppCompatActivity implements  NavigationView.O
                 break;
             case R.id.nav_send:
                 Toast.makeText(this, "Send", Toast.LENGTH_SHORT).show();
-                break;
+                break;*/
         }
 
 

@@ -11,6 +11,6 @@ import retrofit2.http.Query;
 
 public interface BookNetAPI {
 
-    @GET("read.php") //[TODO] server side increase features and pretty url support
+    @GET("read.php") //[TODO] server side increase features and pretty url support ***Change in V2***
     Call<List<Book>> read(@Query("BookTitle") String title);
 }

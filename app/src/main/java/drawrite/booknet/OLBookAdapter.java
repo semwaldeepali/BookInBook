@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -18,7 +17,6 @@ import drawrite.booknet.model.OLBook;
 
 public class OLBookAdapter extends ArrayAdapter<OLBook> {
 
-    // View lookup cache
     private static class ViewHolder {
         public ImageView ivCover;
         public TextView tvTitle;
@@ -36,6 +34,7 @@ public class OLBookAdapter extends ArrayAdapter<OLBook> {
     public View getView(int position, View convertView, ViewGroup parent) {
         // Get the data item for this position
         final OLBook book = getItem(position);
+
         // Check if an existing view is being reused, otherwise inflate the view
         ViewHolder viewHolder; // view lookup cache stored in tag
         if (convertView == null) {

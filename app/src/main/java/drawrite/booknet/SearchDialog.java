@@ -62,7 +62,7 @@ public class SearchDialog extends AppCompatDialogFragment {
 
 
 
-    public interface SearchDialogListener{  //listener implemented in the BookDetailActivityTabbed.
+    public interface SearchDialogListener{  //listener implemented in the BookDetailActivityTabbed's fragment.
         void  applyTexts(String bookName);
     }
 

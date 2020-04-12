@@ -68,6 +68,7 @@ public abstract class BookNetDatabase extends RoomDatabase {
 
         @Override
         protected  Void doInBackground(Void... voids){
+            //TODO : add more basic data
             bookDao.insertBook(new Book("olid 1","grid 1",
                     "title 1","sub title 1","author 1",
                     "publisher 1","publishyear 1",

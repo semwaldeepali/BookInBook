@@ -3,7 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainBookDetailFragment">
+    tools:context=".FragmentDetailedBook">
+
+
+    <ProgressBar
+        android:id="@+id/detailed_book_progressbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:layout_gravity="center"/>
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
@@ -28,6 +36,7 @@
                     android:layout_width="280dp"
                     android:layout_height="280dp" />
 
+                <!-- TODO : Fix Text size hardcoded-->
                 <TextView
                     android:id="@+id/tvTitle"
                     android:layout_width="wrap_content"
@@ -44,6 +53,8 @@
                     android:layout_marginTop="8dp"
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp" />
+
+
                 <TextView
                     android:id="@+id/tvAuthor"
                     android:layout_width="wrap_content"
@@ -99,6 +110,8 @@
                     android:layout_marginTop="8dp"
                     android:textSize="14sp" />
 
+
+
                 <Button
                     android:id="@+id/btnAddEdge"
                     android:layout_width="match_parent"
@@ -106,11 +119,15 @@
                     android:layout_marginTop="8dp"
                     android:text="Add Link"
                     android:background="@color/colorAccent"
+                    android:textColor="@color/colorPrimary"
                     android:visibility="invisible"
                     />
+
+
 
             </LinearLayout>
         </ScrollView>
     </LinearLayout>
+
 
 </FrameLayout>

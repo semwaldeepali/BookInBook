@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.support.v7.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -31,54 +32,117 @@ import drawrite.booknet.entity.Book;
 import drawrite.booknet.model.OLBook;
 import drawrite.booknet.repository.BookRepository;
 
+import static drawrite.booknet.SearchableActivity.DRAWRITE_NOCONNECTION;
 import static drawrite.booknet.SearchableActivity.EXTRA_QUERY;
 
 public class OLBookListActivity extends BaseActivity {
-    public static final String BOOK_DETAIL_KEY = "Book";
+    public static final String BOOK_DETAIL_KEY = "BookDetailSerialized";
+    public static final String BOOK_ENTITY_KEY = "BookEntitySerialized";
+
     public static final String IS_FRESH_QUERY = "IsFreshQuery";
-    public static final String BOOKNET_MAIN_BOOK_OLID = "booknetMainBookOlId";
-    public static final String BOOKNET_MAIN_BOOK_PID = "booknetMainBookPrimaryId";
+    public static final String BOOKNET_INNER_BOOK_OLID = "booknetInnerBookOLID";
+    public static final String BOOKNET_INNER_BOOK_PID = "booknetInnerBookPID";
+
+    // When the mentions become main book for our main detailed book
+    public static final String BOOKNET_OUTER_BOOK_OLID = "booknetOuterBookOLID";
+    public static final String BOOKNET_OUTER_BOOK_PID = "booknetOuterBookPId";
 
 
-    private boolean isFreshQuery ;
-    private String mainBookOlId;
-    private Integer mainBookPrimaryId;
+    private boolean isFreshQuery = true;
+    private boolean isOuterBookList = false;
+    private String outerBookOLID;
+    private String innerBookOLID;
+    private Integer outerBookPID;
+    private Integer innerBookPID;
     private ListView lvBooks;
+    private TextView tvNoInternet;
     private OLBookAdapter bookAdapter;
     private OLBookClient client;
     private String query;
 
     @Override
+    public void onStart() {
+        super.onStart();
+        Log.d("OLBookListActivity"," Active");
+
+    }
+
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ol_book_list);
-        lvBooks = findViewById(R.id.lvBooks);
-        ArrayList<OLBook> aBooks = new ArrayList<OLBook>();
-        bookAdapter = new OLBookAdapter(this, aBooks);
-        lvBooks.setAdapter(bookAdapter);
-        Log.d("OLBookListActivity", "1103 before accessing query !");
+
 
         //get the query
         Intent intent = getIntent();
-        query = intent.getStringExtra(EXTRA_QUERY);
-        Log.d("OLBookListActivity", "1103 after accessing query ! " + query);
+        if(intent.hasExtra(EXTRA_QUERY)) {
 
-        //check if it is fresh query
-        isFreshQuery = intent.getBooleanExtra(IS_FRESH_QUERY, true);
-        Log.d("OLBookListActivity", "1103 is fresh query ?  " + isFreshQuery);
-        //get the main book id if not fresh query
-        mainBookOlId = intent.getStringExtra(BOOKNET_MAIN_BOOK_OLID);
-        Log.d("OLBookListActivity", "1103 got main book id ! " + mainBookOlId);
+            Log.d("OLBookListActivity", "1103 before accessing query !");
 
-        mainBookPrimaryId = intent.getIntExtra(BOOKNET_MAIN_BOOK_PID,-1);
-        Log.d("OLBookListActivity", "1103 got main book id ! " + mainBookPrimaryId);
+            query = intent.getStringExtra(EXTRA_QUERY);
+
+            Log.d("OLBookListActivity", "1103 after accessing query ! " + query);
+
+            if(query.equals(DRAWRITE_NOCONNECTION)) {
+                tvNoInternet = findViewById(R.id.tvNoInternet);
+                tvNoInternet.setVisibility(View.VISIBLE);
+                tvNoInternet.setText("Looks like you are offline !");
+                Log.d("OLBookListActivity", "1103 We know no internet connection " + query);
 
 
-        //fetch books remotely TODO move to asynchronous thread [?]
-        fetchBooks(query);
+            }
+            else {
+                lvBooks = findViewById(R.id.lvBooks);
+                ArrayList<OLBook> aBooks = new ArrayList<OLBook>();
+                bookAdapter = new OLBookAdapter(this, aBooks);
+                lvBooks.setAdapter(bookAdapter);
+                lvBooks.setVisibility(View.VISIBLE);
 
-        // set the listener for details
-        setupBookSelectedListener(isFreshQuery);
+                //check if it is fresh query (By Default query is fresh)
+                if(intent.hasExtra(IS_FRESH_QUERY)) {
+                    isFreshQuery = intent.getBooleanExtra(IS_FRESH_QUERY, true);
+                    Log.d("OLBookListActivity", "1103 is fresh query ?  " + isFreshQuery);
+                }
+
+                //get the detailed book id if not fresh query for (inner wrt to detailed book) i.e. books mentioned in detailed book
+                if(!isFreshQuery && intent.hasExtra(BOOKNET_INNER_BOOK_OLID)) {
+
+                    //This is the list of candidate outer books that contains inner book detailed
+                    isOuterBookList = true;
+
+                    innerBookOLID = intent.getStringExtra(BOOKNET_INNER_BOOK_OLID);
+                    Log.d("OLBookListActivity", "1103 got main book id ! " + innerBookOLID);
+
+                    innerBookPID = intent.getIntExtra(BOOKNET_INNER_BOOK_PID, -1);
+                    Log.d("OLBookListActivity", "1103 got main book id ! " + innerBookPID);
+                }
+
+                //get the detailed book id if not fresh query ; books that mention detailed book
+                if(!isFreshQuery && intent.hasExtra(BOOKNET_OUTER_BOOK_OLID)) {
+
+                    outerBookOLID = intent.getStringExtra(BOOKNET_OUTER_BOOK_OLID);
+                    Log.d("OLBookListActivity", "1103 got main book id ! " + outerBookOLID);
+                    outerBookPID = intent.getIntExtra(BOOKNET_OUTER_BOOK_PID,-1);
+                    Log.d("OLBookListActivity", "1103 got main book id ! " + outerBookPID);
+
+                }
+
+
+
+                // TODO.V2 : include selection from Local db. Remove local data completely only Cache
+                //fetch books remotely TODO move to asynchronous thread [?]
+                fetchBooks(query);
+
+                // set the listener for details
+                setupBookSelectedListener(isFreshQuery);
+            }
+        }
+        else {
+
+            Log.d("OLBookListActivity", "1103 NO QUERY ! ");
+        }
+
     }
 
     // This inflates the search option
@@ -96,10 +160,38 @@ public class OLBookListActivity extends BaseActivity {
         return true;
     }
 
+    /*  Function : Capitalizes first letter of each word (non functional).
+      Parameter : String to be formatted.
+      Return : formatted string.
+      */
+    private String capitalizeFirstLetter(String str){
+
+        //TODO : don't capitalize functional words
+
+        String formattedString = "";
+        String[] words;
+
+        // Split the string by space
+        if(str!=null) {
+            words = str.split(" ");
+            // upper case each word's first letter
+            for (int i = 0; i < words.length; i++) {
+                if (words[i].length() > 1)
+                    words[i] = words[i].substring(0, 1).toUpperCase() + words[i].substring(1).toLowerCase();
+                formattedString = formattedString + " " +words[i];
+            }
+        }
+
+        Log.d("FragmentedDetailedBook","1103 formatted String is " + formattedString);
+        return formattedString;
+
+    }
+
     // 1. Executes an API call to the OpenLibrary search endpoint,
     // 2. parses the results
     // 3. Converts them into an array of book objects and adds them to the adapter
     private void fetchBooks(String query) {
+
         client = new OLBookClient();
         client.getBooks(query, new JsonHttpResponseHandler() {
             @Override
@@ -117,8 +209,12 @@ public class OLBookListActivity extends BaseActivity {
                         // Remove all books from the adapter
                         bookAdapter.clear();
 
+
+                        // Disable progress bar once books are found
+                        findViewById(R.id.book_list_progressbar).setVisibility(View.GONE);
+
+
                         // Load model objects into the adapter
-                        // TODO : Provide check option to add the "mentions" book.
                         for (OLBook book : books) {
                             bookAdapter.add(book); // add book through the adapter
                         }
@@ -144,14 +240,27 @@ public class OLBookListActivity extends BaseActivity {
 
 
                 // 1. Asynchronous adding the book to the local
-                // TODO: Web updating ; [Also, if this is the best place to update local cache]
+                // TODO.V2 : Web updating ; [Also, if this is the best place to update local cache] ***Change in V2***
                 Toast.makeText(getApplicationContext(), "added", Toast.LENGTH_SHORT).show();
 
-                //adding book to local table
+                // Adding book to local table
                 BookRepository repository = new BookRepository((Application) getApplicationContext());
                 drawrite.booknet.model.OLBook OLbook = bookAdapter.getItem(position);
+
+                // Formatting strings & Updating Table
+                String mBookTitle = OLbook.getTitle();
+                String mBookSubTitle = OLbook.getSubTitle();
+                String mAuthor = OLbook.getAuthor();
+                String mPublisher = OLbook.getPublisher();
+
+                mBookTitle = capitalizeFirstLetter(mBookTitle);
+                mBookSubTitle = capitalizeFirstLetter(mBookSubTitle);
+                mAuthor = capitalizeFirstLetter(mAuthor);
+                mPublisher = capitalizeFirstLetter(mPublisher);
+
+
                 repository.insert(new Book(OLbook.getOpenLibraryId(),OLbook.getGoodReadsId(),
-                        OLbook.getTitle(),OLbook.getSubTitle(),OLbook.getAuthor(),OLbook.getPublisher(),
+                        mBookTitle,mBookSubTitle,mAuthor,mPublisher,
                         OLbook.getPublishYear(),Integer.toString(OLbook.getNrPages())));
 
                 // 1. Starting detail activity
@@ -159,14 +268,24 @@ public class OLBookListActivity extends BaseActivity {
                 if(!isFreshQuery) {
 
                     intent = new Intent(OLBookListActivity.this, BookDetailActivity.class);
-                    intent.putExtra(BOOKNET_MAIN_BOOK_OLID,mainBookOlId);
-                    intent.putExtra(BOOKNET_MAIN_BOOK_PID,mainBookPrimaryId);
-                }
-                    else
-                    intent  = new Intent(OLBookListActivity.this, BookDetailActivityTabbed.class);
 
+                    // if the list is for outer book, pass the data for inner detailed book.
+                    if(isOuterBookList){
+                        intent.putExtra(BOOKNET_INNER_BOOK_OLID,innerBookOLID);
+                        intent.putExtra(BOOKNET_INNER_BOOK_PID,innerBookPID);
+                    }
+                    else {
+                        intent.putExtra(BOOKNET_OUTER_BOOK_OLID,outerBookOLID);
+                        intent.putExtra(BOOKNET_OUTER_BOOK_PID,outerBookPID);
+
+                    }
+                }
+                else {
+
+                    intent = new Intent(OLBookListActivity.this, BookDetailActivityTabbed.class);
+                }
                 intent.putExtra(BOOK_DETAIL_KEY, bookAdapter.getItem(position));
-                    startActivity(intent);
+                startActivity(intent);
 
             }
         });

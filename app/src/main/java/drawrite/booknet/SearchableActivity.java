@@ -1,6 +1,6 @@
 package drawrite.booknet;
 
-
+//TODO : how much waiting to show?
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
@@ -22,10 +22,17 @@ import drawrite.booknet.model.Book;
 public class SearchableActivity extends AppCompatActivity {
 
     public static final String EXTRA_QUERY = "extraQuery";
-    //private BookAdapter adapter;
+    public static final String DRAWRITE_NOCONNECTION = "NOINTERNETCONNECTION";
     private RecyclerView recyclerView;
 
     ProgressDialog progressDialog;
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d("SearchableActivity"," Active");
+
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -34,12 +41,22 @@ public class SearchableActivity extends AppCompatActivity {
 
         Log.d("SearchableActivity","onCreateFunction");
 
-        //[TODO] 1. add progress bar when search is happening.
-        // TODO: 2. handle pressing of back button after search
+        // TODO : Give auto fill search options
 
         // Get the intent, verify the action and get the query
         Intent intent = getIntent();
-        handleIntent(intent);
+        boolean isNetworkAvailable = false;
+        //Check internet connection
+        if(CheckNetwork.isInternetAvailable(this)) //returns true if internet available
+        {
+            isNetworkAvailable = true;
+
+        }
+        else
+        {
+            Toast.makeText(this,"No Internet Connection", Toast.LENGTH_LONG).show();
+        }
+        handleIntent(intent,isNetworkAvailable);
 
     }
     @Override
@@ -58,11 +75,25 @@ public class SearchableActivity extends AppCompatActivity {
 
     @Override
     protected void onNewIntent(Intent intent) {
+        boolean isNetworkAvailable = false;
+        //Check internet connection
+        if(CheckNetwork.isInternetAvailable(this)) //returns true if internet available
+        {
+            isNetworkAvailable = true;
 
-        handleIntent(intent);
+        }
+        else
+        {
+            Toast.makeText(this,"No Internet Connection", Toast.LENGTH_LONG).show();
+        }
+        handleIntent(intent,isNetworkAvailable);
+
+
     }
 
-    private void handleIntent(Intent intent) {
+
+
+    private void handleIntent(Intent intent, boolean isNetworkAvailable) {
 
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             progressDialog = new ProgressDialog(this);
@@ -71,9 +102,12 @@ public class SearchableActivity extends AppCompatActivity {
 
             // [TODO] implement function to check the query is valid
             String query = intent.getStringExtra(SearchManager.QUERY);
-            Log.d("SearchableActivity","Got the search query");
+            query = query.trim();
+            if (query != null) {
+                Log.d("SearchableActivity", "Got the search query");
 
-            /* [TODO] add the logic for local and asynchronous web search for the book
+            /* [TODO] add the logic for local and asynchronous web search for the book ***Change in V2***
+
 
                 when search is received :
                 1. if (book_id exists in local db) :
@@ -95,11 +129,11 @@ public class SearchableActivity extends AppCompatActivity {
 
 
              */
-            // [TODO] implement Case 1
+                // [TODO] implement Case 1 ***Change in V2***
 
-            //Case 2
+                //Case 2
             /*Create handle for the RetrofitInstance interface
-            [TODO] figure out processing sequence (parrallel or serial) for these 3 cases
+            [TODO] figure out processing sequence (parrallel or serial) for these 3 cases ***Change in V2***
             BookNetAPI service = BookNetClient.getRetrofitInstance().create(BookNetAPI.class);
             Call<List<Book>> call = service.read(query);
             call.enqueue(new Callback<List<Book>>() {
@@ -117,12 +151,20 @@ public class SearchableActivity extends AppCompatActivity {
                 }
             });*/
 
-            // case 3
-            // call OLBookList Activity
-            Intent OLintent = new Intent(this, OLBookListActivity.class);
-            OLintent.putExtra(EXTRA_QUERY, query);
-            startActivity(OLintent);
+                // case 3
+                // call OLBookList Activity
+                Intent OLintent = new Intent(this, OLBookListActivity.class);
+                if (isNetworkAvailable) {
+                    OLintent.putExtra(EXTRA_QUERY, query);
+                } else {
+                    OLintent.putExtra(EXTRA_QUERY, DRAWRITE_NOCONNECTION);
+                }
+                startActivity(OLintent);
 
+                //Finishing the activity to prevent loading screen when back is pressed.
+                SearchableActivity.this.finish();
+
+            }
         }
 
 

@@ -25,7 +25,7 @@ public class TestViewMentionsListActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
-        //TODO : On clicking book show the mentions details
+        //TODO : Don't need On clicking book show the mentions details
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mention_list);
 

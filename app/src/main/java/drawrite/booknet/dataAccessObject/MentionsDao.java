@@ -49,6 +49,10 @@ public interface MentionsDao { // NOTE: interface because room will auto generat
     @Query("SELECT mentions_book_id from mentions_table where main_book_id == :mainBookId")
     List<Integer> getMentionsByBookIds(Integer mainBookId);
 
+    //Get the mentions based on main_book_id
+    @Query("SELECT main_book_id from mentions_table where mentions_book_id == :mentionsBookId")
+    List<Integer> getMainByBookIds(Integer mentionsBookId);
+
 
 
 }

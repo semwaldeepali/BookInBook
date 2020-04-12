@@ -44,6 +44,21 @@ public class MentionsRepository {
         return future.get();
     }
 
+
+    public List<Integer> getMainByBookIds(final Integer mentionsBookId) throws ExecutionException, InterruptedException {
+
+        Callable<List<Integer>> callable = new Callable<List<Integer>>() {
+            @Override
+            public List<Integer> call() throws Exception {
+                return mentionsDao.getMainByBookIds(mentionsBookId);
+            }
+        };
+
+        Future<List<Integer>> future = Executors.newSingleThreadExecutor().submit(callable);
+
+        return future.get();
+    }
+
     public void insert(Mentions mentions){
         Log.d("MentionsRepository", " 1103 insert being executed: main " + mentions.getMainId() +" or mentioned : "+mentions.getMentionsId());
 

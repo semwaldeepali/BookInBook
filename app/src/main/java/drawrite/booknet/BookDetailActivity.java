@@ -6,15 +6,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.SearchView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,15 +26,23 @@ import java.util.concurrent.ExecutionException;
 
 import cz.msebera.android.httpclient.Header;
 import drawrite.booknet.apiClient.OLBookClient;
-import drawrite.booknet.dataAccessObject.BookDao;
-import drawrite.booknet.dataAccessObject.MentionsDao;
 import drawrite.booknet.entity.Book;
 import drawrite.booknet.entity.Mentions;
 import drawrite.booknet.model.OLBook;
 import drawrite.booknet.repository.BookRepository;
 import drawrite.booknet.repository.MentionsRepository;
 
+
+import static drawrite.booknet.OLBookListActivity.BOOKNET_INNER_BOOK_OLID;
+
 public class BookDetailActivity extends BaseActivity {
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d("BookDetailActivity"," Active");
+
+    }
 
     private ImageView ivBookCover;
     private TextView tvTitle;
@@ -64,79 +69,108 @@ public class BookDetailActivity extends BaseActivity {
     private String openLibraryId = "";
     private String goodreadsId = "";
 
-    private String mainBookOlId = "";
-    private Integer mainBookPrimaryId = -1;
-    private Integer mentionBookPrimaryId = -1;
+    private ProgressBar pbDetailBook ;
 
+    // outer book contains the reference to the inner book
+
+    private String outerBookOlId = "";
+    private Integer outerBookPrimaryId = -1;
+
+    private String innerBookOlId = "";
+    private Integer innerBookPrimaryId = -1;
+
+    // if the book being detailed is for outer book or inner book
+    private boolean isOuterBookDetailed = false;
+
+    BookRepository repository ;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_main_book_detail);
+        setContentView(R.layout.fragment_detailed_book);
 
+        // Progress Bar
+        pbDetailBook = findViewById(R.id.detailed_book_progressbar);
 
         // Fetch views
-        ivBookCover =  findViewById(R.id.ivBookCover);
-        tvTitle =  findViewById(R.id.tvTitle);
-        tvAuthor =  findViewById(R.id.tvAuthor);
-
+        ivBookCover = findViewById(R.id.ivBookCover);
+        tvTitle = findViewById(R.id.tvTitle);
+        tvAuthor = findViewById(R.id.tvAuthor);
         tvPublishedByText = findViewById(R.id.tvPublishedByText);
-        tvPublisher =  findViewById(R.id.tvPublisher);
-
+        tvPublisher = findViewById(R.id.tvPublisher);
         tvPageCountText = findViewById(R.id.tvPageCountText);
-        tvPageCount =  findViewById(R.id.tvPageCount);
-
+        tvPageCount = findViewById(R.id.tvPageCount);
         tvPublishedByYearText = findViewById(R.id.tvPublishedYearText);
-        tvPublishYear =  findViewById(R.id.tvPublishYear);
-
-        tvSubTitle =  findViewById(R.id.tvSubTitle);
+        tvPublishYear = findViewById(R.id.tvPublishYear);
+        tvSubTitle = findViewById(R.id.tvSubTitle);
 
         // add link button
         btnAddLink = findViewById(R.id.btnAddEdge);
 
+        repository = new BookRepository((Application) getApplicationContext());
+
         // Use the book to populate the data into our views
         Intent intent = getIntent();
-        if(intent.getExtras()!=null) {
+        if (intent.getExtras() != null) {
             OLBook book = (OLBook) intent.getSerializableExtra(OLBookListActivity.BOOK_DETAIL_KEY);
-            mainBookOlId = intent.getStringExtra(OLBookListActivity.BOOKNET_MAIN_BOOK_OLID);
-            mainBookPrimaryId = intent.getIntExtra(OLBookListActivity.BOOKNET_MAIN_BOOK_PID,-1);
+
+            // The book being detailed is outer book since we are sending inner book data as intent EXTRA
+            if (intent.hasExtra(BOOKNET_INNER_BOOK_OLID)) {
+                // We have the data for inner book already
+                // The book being detailed here is outer book
+                isOuterBookDetailed = true;
+            }
+            if (isOuterBookDetailed) {
+                // get inner book data from intent EXTRAS
+                innerBookPrimaryId = intent.getIntExtra(OLBookListActivity.BOOKNET_INNER_BOOK_OLID, -1);
+                innerBookOlId = intent.getStringExtra(OLBookListActivity.BOOKNET_INNER_BOOK_PID);
+
+            } else {
+                // get outer book data from th extras
+                outerBookOlId = intent.getStringExtra(OLBookListActivity.BOOKNET_OUTER_BOOK_OLID);
+                outerBookPrimaryId = intent.getIntExtra(OLBookListActivity.BOOKNET_OUTER_BOOK_PID, -1);
+            }
+
+            //Format strings
+            bookTitle = capitalizeFirstLetter(book.getTitle());
+            subTitle = capitalizeFirstLetter(book.getSubTitle());
+            author = capitalizeFirstLetter(book.getAuthor());
+            publishYear = book.getPublishYear();
+            openLibraryId = book.getOpenLibraryId();
+            goodreadsId = book.getGoodReadsId();
+
+
+            // Update UI
             loadBook(book);
 
-            // 1. Update the book db with new book.
-            // 1.a Update Local db
-            //adding book
-            BookRepository repository = new BookRepository((Application) getApplicationContext());
+            // Update db with new book.
+            insertBookInDb(book);
 
-            repository.insert(new Book(
-                    BookDetailActivity.this.openLibraryId,
-                    BookDetailActivity.this.goodreadsId,
-                    BookDetailActivity.this.bookTitle,
-                    BookDetailActivity.this.subTitle,
-                    BookDetailActivity.this.author,
-                    BookDetailActivity.this.bookPublisher,
-                    BookDetailActivity.this.publishYear,
-                    BookDetailActivity.this.nrPagesInBook));
-            // TODO 1.b Update web db
-
-            //TODO Start here some error when clicking add link
+            //get inserted book's Primary Id.
 
             // 2. Add the link into mentions table.
-            // Algo : 1. get main book id
+            // Algo : 1. get main book id (Passed with the intent)
             //        2. get mentioned book id
-            //        3. Update the mentions db for the [main, mentioned] case
-            // TODO : Going ahead assuming only "mentions edge"
+            //        3. Update the mentions db for the [main, mentioned] case When AddLink Button is Pressed
             //        see for more detail BookDetailedActivityTabbed
 
-            // 1. get main book id
+
 
             // 2. get mentioned book id
-            // TODO : Check if I get get primary id for mentioned book when it is getting added
 
             try {
                 // Check if null output
-                // clean up accesing bookid multiple times
-                mentionBookPrimaryId = repository.getBookId(BookDetailActivity.this.openLibraryId).get(0);
-                Log.d("BookDetailActivity", " 1103 found  the primary id is valid: main " + mainBookPrimaryId +" or mentioned : "+mentionBookPrimaryId);
+
+                //SET the value based on availability of data
+                if(isOuterBookDetailed)
+                {
+                    // Get the primary id for the book detailed
+                    outerBookPrimaryId = repository.getBookId(BookDetailActivity.this.openLibraryId).get(0);
+                    Log.d("BookDetailActivity", " 1103 found  the primary id is valid: outer " + outerBookPrimaryId +" or inner  : "+ innerBookPrimaryId);
+                } else {
+                    innerBookPrimaryId = repository.getBookId(BookDetailActivity.this.openLibraryId).get(0);
+                    Log.d("BookDetailActivity", " 1103 found  the primary id is valid: outer " + outerBookPrimaryId +" or inner  : "+ innerBookPrimaryId);
+                }
 
             }
             catch (ExecutionException e){
@@ -149,9 +183,56 @@ public class BookDetailActivity extends BaseActivity {
 
 
             }
+
+        }
+    }
+
+    /*  Function : Capitalizes first letter of each word (non functional).
+      Parameter : String to be formatted.
+      Return : formatted string.
+      */
+    private String capitalizeFirstLetter(String str){
+
+        String formattedString = "";
+        String[] words;
+
+        // Split the string by space
+        if(str!=null) {
+            words = str.split(" ");
+            // upper case each word's first letter
+            for (int i = 0; i < words.length; i++) {
+                if (words[i].length() > 1)
+                    words[i] = words[i].substring(0, 1).toUpperCase() + words[i].substring(1).toLowerCase();
+                formattedString = formattedString + " " +words[i];
+            }
         }
 
+        Log.d("FragmentedDetailedBook","1103 formatted String is " + formattedString);
+        return formattedString;
+
     }
+
+    private void insertBookInDb(OLBook book){
+
+
+
+        //TODO.V2 primary id is returned when insert happens; Check if that can be used here. ** Change in V2 **
+        // It will save one query for geting primary id for inserted book. below
+
+
+        repository.insert(new Book(
+                    BookDetailActivity.this.openLibraryId,
+                    BookDetailActivity.this.goodreadsId,
+                    BookDetailActivity.this.bookTitle,
+                    BookDetailActivity.this.subTitle,
+                    BookDetailActivity.this.author,
+                    BookDetailActivity.this.bookPublisher,
+                    BookDetailActivity.this.publishYear,
+                    BookDetailActivity.this.nrPagesInBook));
+        // TODO.V2 1.b Update web db
+
+    }
+
 
     // Populate data for the book
     private void loadBook(OLBook book) {
@@ -160,13 +241,8 @@ public class BookDetailActivity extends BaseActivity {
         Context c = getApplicationContext(); // cannot directly set picasso without getting activity context
         Picasso.with(c).load(Uri.parse(book.getLargeCoverUrl())).error(R.drawable.ic_nocover).into(ivBookCover);
 
-        bookTitle = book.getTitle();
-        subTitle = book.getSubTitle();
-        author = book.getAuthor();
-        publishYear = book.getPublishYear();
-        openLibraryId = book.getOpenLibraryId();
-        goodreadsId = book.getGoodReadsId();
 
+        pbDetailBook.setVisibility(View.GONE);
 
         //update the book details whatever is present.
         if(!bookTitle.isEmpty() && bookTitle!=null)
@@ -197,21 +273,21 @@ public class BookDetailActivity extends BaseActivity {
         btnAddLink.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO : why restarting the activity with fresh search
+
                 Toast.makeText(getBaseContext(), "Added book link", Toast.LENGTH_SHORT).show();
                 Log.d("BookDetailActivity", " 1103 clicked the add link ");
                 //3.Update the mentions db for the [main, mentioned] case
-                if(mainBookPrimaryId!=-1 && mentionBookPrimaryId!=-1)
+                if(outerBookPrimaryId!=-1 && innerBookPrimaryId!=-1)
                 {
-                    Log.d("BookDetailActivity", " 1103 either of the primary id is valid: main " + mainBookPrimaryId +" or mentioned : "+mentionBookPrimaryId);
+                    Log.d("BookDetailActivity", " 1103 either of the primary id is valid: outer " + outerBookPrimaryId +" or inner : "+innerBookPrimaryId);
 
-                    Mentions mentionPair = new Mentions(mainBookPrimaryId,mentionBookPrimaryId);
+                    Mentions mentionPair = new Mentions(outerBookPrimaryId,innerBookPrimaryId);
                     MentionsRepository mentionsRepository = new MentionsRepository((Application) getApplicationContext());
                     mentionsRepository.insert(mentionPair);
                     Log.d("BookDetailActivity", " 1103 Instertion initiated for mentions");
                 }
                 else {
-                    Log.d("BookDetailActivity", " 1103 either of the primary id is not valid: main " + mainBookPrimaryId +" or mentioned : "+mentionBookPrimaryId);
+                    Log.d("BookDetailActivity", " 1103 either of the primary id is not valid: outer " + outerBookPrimaryId +" or inner : "+ innerBookPrimaryId);
 
 
                 }
@@ -247,11 +323,14 @@ public class BookDetailActivity extends BaseActivity {
                                 }
 
 
+                            }else
+                            {
+                                tvPublishedByText.setVisibility(View.INVISIBLE);
+                                tvPublisher.setVisibility(View.INVISIBLE);
                             }
                             if (response.has("number_of_pages")) {
                                 String nrPages = Integer.toString(response.getInt("number_of_pages")) ;
                                 BookDetailActivity.this.nrPagesInBook = nrPages;
-                                // TODO fix the pageCountText not getting invisible ... look for book : Grimms' Fairy Tales
                                 if(!nrPages.isEmpty() && nrPages!=null)
                                     tvPageCount.setText(nrPages + " pages") ;
                                 else
@@ -260,6 +339,10 @@ public class BookDetailActivity extends BaseActivity {
                                     tvPageCount.setVisibility(View.INVISIBLE);
                                 }
 
+                            }else
+                            {
+                                tvPageCountText.setVisibility(View.INVISIBLE);
+                                tvPageCount.setVisibility(View.INVISIBLE);
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();

@@ -6,28 +6,33 @@
     android:background="@color/colorAccent"
     android:gravity="bottom"
     android:padding="16dp"
-    android:theme="@style/ThemeOverlay.AppCompat.Dark"
+    android:theme="@style/AppTheme"
     android:orientation="vertical"
     >
     <!--theme attribute above sets the text color white TODO apparently it dosent do that . So fix it.-->
 
-    <ImageView
+<!--    <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@mipmap/ic_launcher"
+        android:src="@mipmap/ic_launcher_custom"
+        />
+    -->
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:text="BookNet"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Title"
+        android:textColor="@color/colorPrimary"
         />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingTop="8dp"
-        android:text="Book Network"
-        android:textAppearance="@style/Base.TextAppearance.AppCompat.Body1"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingTop="8dp"
-        android:text="booknet@gmail.com"/>
+        android:text="booknet@gmail.com"
+        android:textColor="@color/colorPrimary"
+        />
 
 </LinearLayout>

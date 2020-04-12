@@ -48,6 +48,7 @@ public class MentionsViewModel extends AndroidViewModel {
         return allMentions;
     }
 
+    //TODO : implement remaining methods here.
     //public LiveData<List<Mentions>> getMentionsByBookIds(Integer mainBookPrimaryId){ return repository.getMentionsByBookIds(mainBookPrimaryId);}
 
     //public LiveData<List<String>> getBookId(String olId) { return repository.getBookId(olId); }

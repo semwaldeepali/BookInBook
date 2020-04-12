@@ -23,8 +23,6 @@ public class OLBook implements Serializable {
     private int nrPages;
 
 
-    //private String mention; [TODO] when differentiation is needed Task1
-
     public String getOpenLibraryId() {
 
         return openLibraryId;

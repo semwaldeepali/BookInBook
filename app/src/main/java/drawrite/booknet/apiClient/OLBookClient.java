@@ -23,6 +23,8 @@ public class OLBookClient {
         return API_BASE_URL + relativeUrl;
     }
 
+    //TODO : improve search results.
+
     // Method for accessing the search API
     public void getBooks(final String query, JsonHttpResponseHandler handler) {
         try {

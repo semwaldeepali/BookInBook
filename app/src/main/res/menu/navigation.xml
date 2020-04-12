@@ -5,24 +5,32 @@
 
     <group android:checkableBehavior="single">
         <!-- checkable single; keeps the single item in the group checked -->
+
+        <item
+            android:id="@+id/nav_Home"
+            android:icon="@drawable/ic_home"
+            android:title="Home"
+            />
+
+
         <item
             android:id="@+id/nav_viewBook"
             android:icon="@drawable/ic_view"
-            android:title="View Books" />
+            android:title="Explore Shelf"
 
-        <item
-            android:id="@+id/nav_addBook"
-            android:icon="@drawable/ic_add"
-            android:title="Add Books" />
+            />
+        <!--
 
         <item
             android:id="@+id/nav_profile"
             android:icon="@drawable/ic_profile"
             android:title="Profile" />
+            -->
 
     </group>
 
     <!-- wont stay selected but initiates an action -->
+    <!--
     <item android:title="Communicate">
 
         <menu>
@@ -36,5 +44,6 @@
                 android:title="Send" />
         </menu>
     </item>
+    -->
 
 </menu>

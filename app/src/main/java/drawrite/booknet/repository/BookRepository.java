@@ -50,6 +50,10 @@ public class BookRepository {
         return  bookDao.getBookByPID(mainBookPrimaryId);
     }
 
+    public LiveData<List<Book>> getBookByTitle(String bookTitle){
+        return bookDao.getBookByTitle(bookTitle);
+    }
+
     public LiveData<List<Book>> getAllBooks() {
         return allBooks;
     }
