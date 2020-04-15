@@ -29,7 +29,7 @@
         android:layout_toRightOf="@+id/ivBookCover"
         android:ellipsize="end"
         android:maxLines="1"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
         />
     <TextView
         android:id="@+id/tvSubtitle"
@@ -49,7 +49,6 @@
         android:layout_marginLeft="8dp"
         android:layout_toRightOf="@+id/ivBookCover"
         android:layout_below="@+id/tvSubtitle"
-        android:text="Author"
         android:ellipsize="end"
         android:maxLines="1"
         />

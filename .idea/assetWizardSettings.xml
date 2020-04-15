@@ -34,8 +34,8 @@
                         <option name="values">
                           <map>
                             <entry key="assetSourceType" value="FILE" />
-                            <entry key="outputName" value="ic_quotes_end" />
-                            <entry key="sourceFile" value="$USER_HOME$/BookNetData/quotes_end.svg" />
+                            <entry key="outputName" value="ic_bookcover_front" />
+                            <entry key="sourceFile" value="$USER_HOME$/BookNetData/bookCoverFront.svg" />
                           </map>
                         </option>
                       </PersistentState>
