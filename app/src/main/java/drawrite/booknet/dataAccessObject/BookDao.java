@@ -53,5 +53,10 @@ public interface BookDao { // NOTE: interface because room will auto generate th
     @Query("SELECT * from book_table WHERE id = :primaryId")
     LiveData<List<Book>> getBookByPID(Integer primaryId);
 
+    //Get list of books based on title
+
+    @Query("SELECT * from book_table WHERE book_title = :bookTitle")
+    LiveData<List<Book>> getBookByTitle(String bookTitle);
+
 
 }

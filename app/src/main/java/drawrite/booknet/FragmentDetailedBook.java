@@ -46,16 +46,13 @@ public class FragmentDetailedBook extends Fragment {
 
     private View view;
     private ImageView ivBookCover;
+
     private TextView tvTitle;
     private TextView tvSubTitle;
     private TextView tvAuthor;
     private TextView tvPublishedByText;
-    private TextView tvPublisher;
     private TextView tvPublishedByYearText;
-    private TextView tvPublishYear;
-
     private TextView tvPageCountText;
-    private TextView tvPageCount;
 
     private ProgressBar pbDetailedBook;
 
@@ -91,18 +88,13 @@ public class FragmentDetailedBook extends Fragment {
         // Fetch views
         ivBookCover =  view.findViewById(R.id.ivBookCover);
         tvTitle =  view.findViewById(R.id.tvTitle);
+        tvSubTitle =  view.findViewById(R.id.tvSubTitle);
         tvAuthor =  view.findViewById(R.id.tvAuthor);
 
         tvPublishedByText = view.findViewById(R.id.tvPublishedByText);
-        tvPublisher =  view.findViewById(R.id.tvPublisher);
-
         tvPageCountText = view.findViewById(R.id.tvPageCountText);
-        tvPageCount =  view.findViewById(R.id.tvPageCount);
-
         tvPublishedByYearText = view.findViewById(R.id.tvPublishedYearText);
-        tvPublishYear =  view.findViewById(R.id.tvPublishYear);
 
-        tvSubTitle =  view.findViewById(R.id.tvSubTitle);
 
         //Progress Bar
         pbDetailedBook = view.findViewById(R.id.detailed_book_progressbar);
@@ -244,11 +236,9 @@ public class FragmentDetailedBook extends Fragment {
                     tvAuthor.setVisibility(View.INVISIBLE);
 
                 if (!publishYear.isEmpty() && publishYear != null)
-                    tvPublishYear.setText(publishYear);
-                else {
+                    tvPublishedByYearText.setText("First Published : " + publishYear + ", ");
+                else
                     tvPublishedByYearText.setVisibility(View.INVISIBLE);
-                    tvPublishYear.setVisibility(View.INVISIBLE);
-                }
 
                 // fetch extra book data from books API
                 client = new OLBookClient();
@@ -257,6 +247,7 @@ public class FragmentDetailedBook extends Fragment {
                             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                                 try {
                                     if (response.has("publishers")) {
+
                                         // display comma separated list of publishers
                                         final JSONArray publisher = response.getJSONArray("publishers");
                                         final int numPublishers = publisher.length();
@@ -266,39 +257,32 @@ public class FragmentDetailedBook extends Fragment {
                                         }
                                         String pubList = TextUtils.join(", ", publishers);
                                         if (!pubList.isEmpty() && pubList != null)
-                                            tvPublisher.setText(pubList);
-                                        else {
+                                            tvPublishedByText.setText("Published By " + pubList + ".");
+                                        else
                                             tvPublishedByText.setVisibility(View.INVISIBLE);
-                                            tvPublisher.setVisibility(View.INVISIBLE);
-                                        }
 
 
                                     }else {
                                         tvPublishedByText.setVisibility(View.INVISIBLE);
-                                        tvPublisher.setVisibility(View.INVISIBLE);
                                     }
                                     if (response.has("number_of_pages")) {
+
                                         String nrPages = Integer.toString(response.getInt("number_of_pages"));
                                         if (!nrPages.isEmpty() && nrPages != null){
                                             Log.d("FragmentDetailedBook", " 1103 nr. of pages !=null" + nrPages);
-
-                                            tvPageCount.setText(nrPages + " pages");
+                                            tvPageCountText.setText( nrPages + " Pages, ");
                                         }
                                         else {
                                             Log.d("FragmentDetailedBook", " 1103 nr. of pages == null");
-
                                             tvPageCountText.setVisibility(View.INVISIBLE);
-                                            tvPageCount.setVisibility(View.INVISIBLE);
                                         }
 
                                     }
                                     else{
                                         tvPageCountText.setVisibility(View.INVISIBLE);
-                                        tvPageCount.setVisibility(View.INVISIBLE);
                                     }
                                 } catch (JSONException e) {
                                     Log.d("FragmentDetailedBook", " 1103 exception " + e );
-
                                     e.printStackTrace();
                                 }
 
@@ -386,15 +370,14 @@ public class FragmentDetailedBook extends Fragment {
                 tvSubTitle.setVisibility(View.INVISIBLE);
 
             if (!author.isEmpty() && author != null)
-                tvAuthor.setText(author);
+                tvAuthor.setText("By : "+ author);
             else
                 tvAuthor.setVisibility(View.INVISIBLE);
 
             if (!publishYear.isEmpty() && publishYear != null)
-                tvPublishYear.setText(publishYear);
+                tvPublishedByYearText.setText("First Published : " + publishYear + ", ");
             else {
                 tvPublishedByYearText.setVisibility(View.INVISIBLE);
-                tvPublishYear.setVisibility(View.INVISIBLE);
             }
 
             // fetch extra book data from books API
@@ -413,34 +396,30 @@ public class FragmentDetailedBook extends Fragment {
                                     }
                                     String pubList = TextUtils.join(", ", publishers);
                                     if (!pubList.isEmpty() && pubList != null)
-                                        tvPublisher.setText(pubList);
+                                        tvPublishedByText.setText("Published By " + pubList + ".");
                                     else {
                                         tvPublishedByText.setVisibility(View.INVISIBLE);
-                                        tvPublisher.setVisibility(View.INVISIBLE);
                                     }
 
 
                                 }else {
                                     tvPublishedByText.setVisibility(View.INVISIBLE);
-                                    tvPublisher.setVisibility(View.INVISIBLE);
                                 }
                                 if (response.has("number_of_pages")) {
                                     String nrPages = Integer.toString(response.getInt("number_of_pages"));
                                     if (!nrPages.isEmpty() && nrPages != null) {
                                         Log.d("FragmentDetailedBook", " 1103 nr. of pages !=null" + nrPages);
-                                        tvPageCount.setText(nrPages + " pages");
+                                        tvPageCountText.setText( nrPages + " Pages, ");
                                     }
                                     else {
                                         Log.d("FragmentDetailedBook", " 1103 nr. of pages == null" );
 
                                         tvPageCountText.setVisibility(View.INVISIBLE);
-                                        tvPageCount.setVisibility(View.INVISIBLE);
                                     }
 
                                 }
                                 else{
                                     tvPageCountText.setVisibility(View.INVISIBLE);
-                                    tvPageCount.setVisibility(View.INVISIBLE);
                                 }
                             } catch (JSONException e) {
                                 Log.d("FragmentDetailedBook", " 1103 exception " + e );

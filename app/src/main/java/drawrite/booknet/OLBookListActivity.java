@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.support.v7.widget.SearchView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -59,6 +60,7 @@ public class OLBookListActivity extends BaseActivity {
     private OLBookAdapter bookAdapter;
     private OLBookClient client;
     private String query;
+    private ProgressBar pbBookList;
 
     @Override
     public void onStart() {
@@ -72,6 +74,7 @@ public class OLBookListActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ol_book_list);
+        pbBookList = findViewById(R.id.book_list_progressbar);
 
 
         //get the query
@@ -85,6 +88,7 @@ public class OLBookListActivity extends BaseActivity {
             Log.d("OLBookListActivity", "1103 after accessing query ! " + query);
 
             if(query.equals(DRAWRITE_NOCONNECTION)) {
+                pbBookList.setVisibility(View.INVISIBLE);
                 tvNoInternet = findViewById(R.id.tvNoInternet);
                 tvNoInternet.setVisibility(View.VISIBLE);
                 tvNoInternet.setText("Looks like you are offline !");
@@ -139,7 +143,9 @@ public class OLBookListActivity extends BaseActivity {
             }
         }
         else {
-
+            tvNoInternet = findViewById(R.id.tvNoInternet);
+            tvNoInternet.setVisibility(View.VISIBLE);
+            tvNoInternet.setText("Uh Oh! Something went wrong. Try Again");
             Log.d("OLBookListActivity", "1103 NO QUERY ! ");
         }
 
@@ -199,6 +205,7 @@ public class OLBookListActivity extends BaseActivity {
                 try {
                     JSONArray docs = null;
                     if(response != null) {
+                        pbBookList.setVisibility(View.INVISIBLE);
 
                         // Get the docs json array
                         docs = response.getJSONArray("docs");
@@ -222,6 +229,10 @@ public class OLBookListActivity extends BaseActivity {
                     }
                 } catch (JSONException e) {
                     // Invalid JSON format, show appropriate error.
+
+                    tvNoInternet = findViewById(R.id.tvNoInternet);
+                    tvNoInternet.setVisibility(View.VISIBLE);
+                    tvNoInternet.setText("Uh Oh! Something went wrong. Try Again");
                     e.printStackTrace();
                 }
             }

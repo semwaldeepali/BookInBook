@@ -8,5 +8,16 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:textColor">@color/colorAccent</item>
+        <item name="android:dropDownListViewStyle">@style/BooknetDropDownListViewStyle</item>
+        <item name="android:dropDownItemStyle">@style/BooknetDropDownItemStyle </item>
+    </style>
+
+    <style name="BooknetDropDownItemStyle" parent="Widget.AppCompat.DropDownItem.Spinner">
+        <item name="android:textColor">@color/colorAccent</item>
+        <item name="android:textSize">14dp</item>
+    </style>
+
+    <style name="BooknetDropDownListViewStyle" parent="Widget.AppCompat.ListView.DropDown">
+        <item name="android:background">#FFF</item>
     </style>
 </resources>

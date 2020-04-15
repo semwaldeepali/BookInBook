@@ -97,11 +97,8 @@ public class BookDetailActivity extends BaseActivity {
         tvTitle = findViewById(R.id.tvTitle);
         tvAuthor = findViewById(R.id.tvAuthor);
         tvPublishedByText = findViewById(R.id.tvPublishedByText);
-        tvPublisher = findViewById(R.id.tvPublisher);
         tvPageCountText = findViewById(R.id.tvPageCountText);
-        tvPageCount = findViewById(R.id.tvPageCount);
         tvPublishedByYearText = findViewById(R.id.tvPublishedYearText);
-        tvPublishYear = findViewById(R.id.tvPublishYear);
         tvSubTitle = findViewById(R.id.tvSubTitle);
 
         // add link button
@@ -261,11 +258,10 @@ public class BookDetailActivity extends BaseActivity {
             tvAuthor.setVisibility(View.INVISIBLE);
 
         if(!publishYear.isEmpty() && publishYear!=null)
-            tvPublishYear.setText(publishYear);
+            tvPublishedByYearText.setText("Published By - "+publishYear);
         else
         {
             tvPublishedByYearText.setVisibility(View.INVISIBLE);
-            tvPublishYear.setVisibility(View.INVISIBLE);
         }
 
 
@@ -315,34 +311,30 @@ public class BookDetailActivity extends BaseActivity {
                                 String publisherName = TextUtils.join(", ", publishers);
                                 BookDetailActivity.this.bookPublisher = publisherName;
                                 if(!publisherName.isEmpty() && publisherName!=null)
-                                    tvPublisher.setText(publisherName);
+                                    tvPublishedByText.setText("Published By - "+publisherName);
                                 else
                                 {
                                     tvPublishedByText.setVisibility(View.INVISIBLE);
-                                    tvPublisher.setVisibility(View.INVISIBLE);
                                 }
 
 
                             }else
                             {
                                 tvPublishedByText.setVisibility(View.INVISIBLE);
-                                tvPublisher.setVisibility(View.INVISIBLE);
                             }
                             if (response.has("number_of_pages")) {
                                 String nrPages = Integer.toString(response.getInt("number_of_pages")) ;
                                 BookDetailActivity.this.nrPagesInBook = nrPages;
                                 if(!nrPages.isEmpty() && nrPages!=null)
-                                    tvPageCount.setText(nrPages + " pages") ;
+                                    tvPageCountText.setText(nrPages + " Pages") ;
                                 else
                                 {
                                     tvPageCountText.setVisibility(View.INVISIBLE);
-                                    tvPageCount.setVisibility(View.INVISIBLE);
                                 }
 
                             }else
                             {
                                 tvPageCountText.setVisibility(View.INVISIBLE);
-                                tvPageCount.setVisibility(View.INVISIBLE);
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();

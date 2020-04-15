@@ -66,6 +66,10 @@
 
         </activity>
 
+        <provider
+            android:authorities="drawrite.booknet.SearchSuggestionProvider"
+            android:name=".SearchSuggestionProvider"/>
+
         <!-- Points to searchable activity so the whole app can invoke search. -->
         <meta-data
             android:name="android.app.default_searchable"

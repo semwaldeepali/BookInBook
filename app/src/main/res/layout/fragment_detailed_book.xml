@@ -63,54 +63,40 @@
                     android:layout_marginTop="8dp" />
 
                 <View
-                    android:background="@android:color/darker_gray"
+                    android:background="@color/colorPrimary"
                     android:layout_width="280dp"
                     android:layout_height="1px"
                     android:layout_marginTop="8dp" />
 
-                <TextView
-                    android:id = "@+id/tvPublishedByText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Published By"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/tvPublisher"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="14sp" />
-                <TextView
-                    android:id = "@+id/tvPublishedYearText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Published Year"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/tvPublishYear"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="14sp" />
 
                 <TextView
                     android:id = "@+id/tvPageCountText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Page Count"
+                    android:textSize="14sp" />
+
+
+                <TextView
+                    android:id = "@+id/tvPublishedYearText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
                     android:textSize="14sp" />
 
                 <TextView
-                    android:id="@+id/tvPageCount"
+                    android:id = "@+id/tvPublishedByText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:textSize="14sp" />
 
 
+                <View
+                    android:background="@color/colorPrimary"
+                    android:layout_width="280dp"
+                    android:layout_height="1px"
+                    android:layout_marginTop="8dp" />
 
                 <Button
                     android:id="@+id/btnAddEdge"

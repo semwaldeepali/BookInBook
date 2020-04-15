@@ -48,13 +48,16 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookHolder> {
         Book currentBook = books.get(position);
         holder.title.setText(currentBook.getTitle());
         holder.author.setText(currentBook.getAuthor());
-        holder.subtitle.setText(String.valueOf(currentBook.getSubTitle()));
-        holder.ivBookCover.setImageResource(R.drawable.ic_nocover);
+        if(currentBook.getSubTitle()!=null)
+            holder.subtitle.setText(String.valueOf(currentBook.getSubTitle()));
+        else
+            holder.subtitle.setVisibility(View.GONE);
+        holder.ivBookCover.setImageResource(R.drawable.ic_book_cover);
         holder.primaryId = currentBook.getId();
         // DIRTY way of loading book cover
         // Populate image data
         // cannot directly set picasso without getting activity context
-        Picasso.with(this.mContext).load(Uri.parse("http://covers.openlibrary.org/b/olid/" + currentBook.getOlid() + "-L.jpg?default=false")).error(R.drawable.ic_nocover).into(holder.ivBookCover);
+        Picasso.with(this.mContext).load(Uri.parse("http://covers.openlibrary.org/b/olid/" + currentBook.getOlid() + "-L.jpg?default=false")).error(R.drawable.ic_book_cover).into(holder.ivBookCover);
 
 
     }

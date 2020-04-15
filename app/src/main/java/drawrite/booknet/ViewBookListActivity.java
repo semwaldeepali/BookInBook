@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -27,6 +28,8 @@ public class ViewBookListActivity extends BaseActivity implements BookAdapter.On
     private BookViewModel bookViewModel;
     private RecyclerView recyclerView;
     private BookAdapter adapter;
+
+    private ProgressBar pbBookList;
 
     @Override
     public void onStart() {
@@ -48,6 +51,9 @@ public class ViewBookListActivity extends BaseActivity implements BookAdapter.On
         adapter = new BookAdapter(new ArrayList<Book>(), this,this);
         recyclerView.setAdapter(adapter);
 
+        //Progress Bar
+        pbBookList = findViewById(R.id.book_list_progressbar);
+
         // Gets the view model access as per the android
         bookViewModel = ViewModelProviders.of(this).get(BookViewModel.class);
 
@@ -55,9 +61,8 @@ public class ViewBookListActivity extends BaseActivity implements BookAdapter.On
         bookViewModel.getAllBooks().observe(this, new Observer<List<Book>>(){
             @Override
             public void onChanged(@Nullable List<Book> books) {
-
-
                 adapter.setBooks(books);
+                pbBookList.setVisibility(View.INVISIBLE);
             }
 
 

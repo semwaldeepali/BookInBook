@@ -27,7 +27,6 @@
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:layout_toRightOf="@+id/ivBookCover"
-        android:text="Title"
         android:ellipsize="end"
         android:maxLines="1"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
@@ -39,7 +38,6 @@
         android:layout_marginLeft="8dp"
         android:layout_toRightOf="@+id/ivBookCover"
         android:layout_below="@+id/tvTitle"
-        android:text="Subtitle"
         android:ellipsize="end"
         android:maxLines="1"
         />

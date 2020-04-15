@@ -20,6 +20,7 @@ public class OLBookAdapter extends ArrayAdapter<OLBook> {
     private static class ViewHolder {
         public ImageView ivCover;
         public TextView tvTitle;
+        public TextView tvSubtitle;
         public TextView tvAuthor;
     }
 
@@ -43,15 +44,26 @@ public class OLBookAdapter extends ArrayAdapter<OLBook> {
             convertView = inflater.inflate(R.layout.ol_book_item, parent, false);
             viewHolder.ivCover = (ImageView)convertView.findViewById(R.id.ivBookCover);
             viewHolder.tvTitle = (TextView)convertView.findViewById(R.id.tvTitle);
+            viewHolder.tvSubtitle = (TextView)convertView.findViewById(R.id.tvSubTitle);
             viewHolder.tvAuthor = (TextView)convertView.findViewById(R.id.tvAuthor);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
         // Populate the data into the template view using the data object
+
         viewHolder.tvTitle.setText(book.getTitle());
         viewHolder.tvAuthor.setText(book.getAuthor());
+        String subtitle = book.getSubTitle();
+        if(!subtitle.isEmpty() && subtitle!=null){
+            viewHolder.tvSubtitle.setText(subtitle);
+        }
+        else {
+            viewHolder.tvSubtitle.setVisibility(View.GONE);
+        }
+
         Picasso.with(getContext()).load(Uri.parse(book.getCoverUrl())).error(R.drawable.ic_nocover).into(viewHolder.ivCover);
+
         // Return the completed view to render on screen
         return convertView;
     }

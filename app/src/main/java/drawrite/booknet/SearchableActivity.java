@@ -5,13 +5,16 @@ import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.provider.SearchRecentSuggestions;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.ViewGroup;
 import android.widget.SearchView;
 import android.widget.Toast;
 
@@ -23,7 +26,6 @@ public class SearchableActivity extends AppCompatActivity {
 
     public static final String EXTRA_QUERY = "extraQuery";
     public static final String DRAWRITE_NOCONNECTION = "NOINTERNETCONNECTION";
-    private RecyclerView recyclerView;
 
     ProgressDialog progressDialog;
 
@@ -41,7 +43,7 @@ public class SearchableActivity extends AppCompatActivity {
 
         Log.d("SearchableActivity","onCreateFunction");
 
-        // TODO : Give auto fill search options
+        // TODO.p5 : Give auto fill search options
 
         // Get the intent, verify the action and get the query
         Intent intent = getIntent();
@@ -69,6 +71,8 @@ public class SearchableActivity extends AppCompatActivity {
                 (SearchView) menu.findItem(R.id.menu_search).getActionView();
         searchView.setSearchableInfo(
                 searchManager.getSearchableInfo(getComponentName()));
+        //[TODO.p5] setting background color to white
+
 
         return true;
     }
@@ -100,9 +104,15 @@ public class SearchableActivity extends AppCompatActivity {
             progressDialog.setMessage("Loading....");
             progressDialog.show();
 
-            // [TODO] implement function to check the query is valid
+            // [TODO.V2] implement function to check the query is valid
             String query = intent.getStringExtra(SearchManager.QUERY);
             query = query.trim();
+
+            // savin the queries for suggestions
+
+            SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
+                    SearchSuggestionProvider.AUTHORITY, SearchSuggestionProvider.MODE);
+            suggestions.saveRecentQuery(query,null);
             if (query != null) {
                 Log.d("SearchableActivity", "Got the search query");
 
