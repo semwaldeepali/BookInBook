@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import drawrite.booknet.entity.Book;
+import drawrite.booknet.entity.Mentions;
 import drawrite.booknet.repository.MentionsRepository;
 import drawrite.booknet.viewModel.BookViewModel;
 
@@ -37,7 +38,7 @@ import static drawrite.booknet.SearchableActivity.EXTRA_QUERY;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class FragmentInnerBooks extends Fragment implements SearchDialog.SearchDialogListener , BookAdapter.OnBookClickListener {
+public class FragmentInnerBooks extends Fragment implements SearchDialog.SearchDialogListener, BookAdapter.OnItemClickListener {
 
 
 
@@ -85,7 +86,6 @@ public class FragmentInnerBooks extends Fragment implements SearchDialog.SearchD
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getContext(), "this book mentions ... books !!", Toast.LENGTH_SHORT).show();
 
                 // Resource : https://codinginflow.com/tutorials/android/custom-dialog-interface
                 // opens the search box for the book to be link
@@ -157,13 +157,12 @@ public class FragmentInnerBooks extends Fragment implements SearchDialog.SearchD
             // Disable progress bar once books are found
             pbInnerBooks.setVisibility(View.GONE);
 
-            view.findViewById(R.id.iv_empty_inner_book).setVisibility(View.VISIBLE);
+            view.findViewById(R.id.tvEmptyInnerBook).setVisibility(View.VISIBLE);
         }
 
         return  view;
     }
     public void openSearchDialog(){
-        Toast.makeText(getContext(), "search dialog opened ", Toast.LENGTH_SHORT).show();
 
         SearchDialog searchDialog = new SearchDialog();
 
@@ -183,25 +182,22 @@ public class FragmentInnerBooks extends Fragment implements SearchDialog.SearchD
 
         // Approach 1: [Dirty] Duplicate the search dialog & book detail activity
         OLintent.putExtra(IS_FRESH_QUERY,false);
-        OLintent.putExtra(BOOKNET_OUTER_BOOK_OLID,detailedBookOlId);
+        OLintent.putExtra(BOOKNET_OUTER_BOOK_OLID, bookDetailActivityTabbed.detailedBookOlId);
         OLintent.putExtra(BOOKNET_OUTER_BOOK_PID,bookDetailActivityTabbed.detailedBookPrimaryId);
 
         Log.d("FragmentInnerBooks", "1103 is fresh query ?  false " );
         Log.d("FragmentInnerBooks", "1103 query book name   " + bookName);
-        Log.d("FragmentInnerBooks", "1103 main book ol id   " + detailedBookOlId);
-        Log.d("FragmentInnerBooks", "1103 main book primary id   " + bookDetailActivityTabbed.detailedBookPrimaryId);
+        Log.d("FragmentInnerBooks", "1103 outer book ol id   " + bookDetailActivityTabbed.detailedBookOlId);
+        Log.d("FragmentInnerBooks", "1103 outer book primary id   " + bookDetailActivityTabbed.detailedBookPrimaryId);
 
 
         startActivity(OLintent);
-        Toast.makeText(getContext(), "got book name to search : " + bookName +"Main book ol id "+ detailedBookOlId, Toast.LENGTH_SHORT).show();
 
     }
     @Override
-    public void OnBookClick(int position, Integer primaryId) {
+    public void onBookClick(int position, Integer primaryId) {
         // 1. Asynchronous adding the book to the local
         // TODO.V2: Web updating ; [Also, if this is the best place to update local cache]
-        Toast.makeText(getContext(), "Book Clicked !! " + primaryId, Toast.LENGTH_SHORT).show();
-
 
         // 1. Starting detail activity
         Intent intent;
@@ -214,4 +210,11 @@ public class FragmentInnerBooks extends Fragment implements SearchDialog.SearchD
     }
 
 
+    @Override
+    public void onDeleteClick(int position, Integer primaryId) {
+        MentionsRepository mentionsRepository = new MentionsRepository((Application) getActivity().getApplicationContext());
+        // Primary id is for inner book
+        mentionsRepository.deleteMention(new Mentions(bookDetailActivityTabbed.detailedBookPrimaryId, primaryId));
+
+    }
 }

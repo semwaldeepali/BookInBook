@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.support.v7.widget.SearchView;
 import android.widget.ProgressBar;
@@ -61,6 +62,7 @@ public class OLBookListActivity extends BaseActivity {
     private OLBookClient client;
     private String query;
     private ProgressBar pbBookList;
+    private ImageView mDelete;
 
     @Override
     public void onStart() {
@@ -89,9 +91,9 @@ public class OLBookListActivity extends BaseActivity {
 
             if(query.equals(DRAWRITE_NOCONNECTION)) {
                 pbBookList.setVisibility(View.INVISIBLE);
-                tvNoInternet = findViewById(R.id.tvNoInternet);
+                tvNoInternet = findViewById(R.id.tvSomeIssue);
                 tvNoInternet.setVisibility(View.VISIBLE);
-                tvNoInternet.setText("Looks like you are offline !");
+                tvNoInternet.setText("Uh Oh! Looks like you are offline !");
                 Log.d("OLBookListActivity", "1103 We know no internet connection " + query);
 
 
@@ -100,6 +102,7 @@ public class OLBookListActivity extends BaseActivity {
                 lvBooks = findViewById(R.id.lvBooks);
                 ArrayList<OLBook> aBooks = new ArrayList<OLBook>();
                 bookAdapter = new OLBookAdapter(this, aBooks);
+
                 lvBooks.setAdapter(bookAdapter);
                 lvBooks.setVisibility(View.VISIBLE);
 
@@ -143,7 +146,7 @@ public class OLBookListActivity extends BaseActivity {
             }
         }
         else {
-            tvNoInternet = findViewById(R.id.tvNoInternet);
+            tvNoInternet = findViewById(R.id.tvSomeIssue);
             tvNoInternet.setVisibility(View.VISIBLE);
             tvNoInternet.setText("Uh Oh! Something went wrong. Try Again");
             Log.d("OLBookListActivity", "1103 NO QUERY ! ");
@@ -230,7 +233,7 @@ public class OLBookListActivity extends BaseActivity {
                 } catch (JSONException e) {
                     // Invalid JSON format, show appropriate error.
 
-                    tvNoInternet = findViewById(R.id.tvNoInternet);
+                    tvNoInternet = findViewById(R.id.tvSomeIssue);
                     tvNoInternet.setVisibility(View.VISIBLE);
                     tvNoInternet.setText("Uh Oh! Something went wrong. Try Again");
                     e.printStackTrace();
@@ -252,7 +255,6 @@ public class OLBookListActivity extends BaseActivity {
 
                 // 1. Asynchronous adding the book to the local
                 // TODO.V2 : Web updating ; [Also, if this is the best place to update local cache] ***Change in V2***
-                Toast.makeText(getApplicationContext(), "added", Toast.LENGTH_SHORT).show();
 
                 // Adding book to local table
                 BookRepository repository = new BookRepository((Application) getApplicationContext());
@@ -272,7 +274,7 @@ public class OLBookListActivity extends BaseActivity {
 
                 repository.insert(new Book(OLbook.getOpenLibraryId(),OLbook.getGoodReadsId(),
                         mBookTitle,mBookSubTitle,mAuthor,mPublisher,
-                        OLbook.getPublishYear(),Integer.toString(OLbook.getNrPages())));
+                        OLbook.getPublishYear(), Integer.toString(OLbook.getNrPages()), false));
 
                 // 1. Starting detail activity
                 Intent intent;

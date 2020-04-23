@@ -6,14 +6,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.widget.SwitchCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.squareup.picasso.Picasso;
@@ -46,17 +49,11 @@ public class BookDetailActivity extends BaseActivity {
 
     private ImageView ivBookCover;
     private TextView tvTitle;
-    private TextView tvSubTitle;
     private TextView tvAuthor;
     private TextView tvPublishedByText;
-    private TextView tvPublisher;
     private TextView tvPublishedByYearText;
-    private TextView tvPublishYear;
-
     private TextView tvPageCountText;
-    private TextView tvPageCount;
-
-    private Button btnAddLink;
+    private ToggleButton btnAddLinkToggle;
 
     private OLBookClient client;
 
@@ -70,17 +67,20 @@ public class BookDetailActivity extends BaseActivity {
     private String goodreadsId = "";
 
     private ProgressBar pbDetailBook ;
+    private SwitchCompat switchCompat;
 
     // outer book contains the reference to the inner book
 
-    private String outerBookOlId = "";
+    //private String outerBookOlId = "";
     private Integer outerBookPrimaryId = -1;
 
-    private String innerBookOlId = "";
+    //private String innerBookOlId = "";
     private Integer innerBookPrimaryId = -1;
 
+    private Boolean isBookInPersonalShelf = false;
+
     // if the book being detailed is for outer book or inner book
-    private boolean isOuterBookDetailed = false;
+    private boolean isThisOuterBook = true;
 
     BookRepository repository ;
 
@@ -99,10 +99,11 @@ public class BookDetailActivity extends BaseActivity {
         tvPublishedByText = findViewById(R.id.tvPublishedByText);
         tvPageCountText = findViewById(R.id.tvPageCountText);
         tvPublishedByYearText = findViewById(R.id.tvPublishedYearText);
-        tvSubTitle = findViewById(R.id.tvSubTitle);
+        switchCompat = findViewById(R.id.switchButton);
+        switchCompat.setChecked(false);
 
         // add link button
-        btnAddLink = findViewById(R.id.btnAddEdge);
+        btnAddLinkToggle = findViewById(R.id.tbAddLink);
 
         repository = new BookRepository((Application) getApplicationContext());
 
@@ -115,16 +116,18 @@ public class BookDetailActivity extends BaseActivity {
             if (intent.hasExtra(BOOKNET_INNER_BOOK_OLID)) {
                 // We have the data for inner book already
                 // The book being detailed here is outer book
-                isOuterBookDetailed = true;
-            }
-            if (isOuterBookDetailed) {
-                // get inner book data from intent EXTRAS
-                innerBookPrimaryId = intent.getIntExtra(OLBookListActivity.BOOKNET_INNER_BOOK_OLID, -1);
-                innerBookOlId = intent.getStringExtra(OLBookListActivity.BOOKNET_INNER_BOOK_PID);
+                isThisOuterBook = true;
+                Log.d("BookDetailActivity", " 1103 Detailed book is inner");
 
+            }
+            if (isThisOuterBook) {
+
+                // get inner book data from intent EXTRAS
+                //innerBookOlId = intent.getStringExtra(OLBookListActivity.BOOKNET_INNER_BOOK_OLID);
+                innerBookPrimaryId = intent.getIntExtra(OLBookListActivity.BOOKNET_INNER_BOOK_PID, -1);
             } else {
                 // get outer book data from th extras
-                outerBookOlId = intent.getStringExtra(OLBookListActivity.BOOKNET_OUTER_BOOK_OLID);
+                //outerBookOlId = intent.getStringExtra(OLBookListActivity.BOOKNET_OUTER_BOOK_OLID);
                 outerBookPrimaryId = intent.getIntExtra(OLBookListActivity.BOOKNET_OUTER_BOOK_PID, -1);
             }
 
@@ -143,6 +146,10 @@ public class BookDetailActivity extends BaseActivity {
             // Update db with new book.
             insertBookInDb(book);
 
+            //set switch
+            if (isBookInPersonalShelf)
+                switchCompat.setChecked(true);
+
             //get inserted book's Primary Id.
 
             // 2. Add the link into mentions table.
@@ -155,18 +162,19 @@ public class BookDetailActivity extends BaseActivity {
 
             // 2. get mentioned book id
 
+            //TODO : check might cause some kind of issue because async insertion
             try {
                 // Check if null output
 
                 //SET the value based on availability of data
-                if(isOuterBookDetailed)
+                if (isThisOuterBook)
                 {
                     // Get the primary id for the book detailed
-                    outerBookPrimaryId = repository.getBookId(BookDetailActivity.this.openLibraryId).get(0);
-                    Log.d("BookDetailActivity", " 1103 found  the primary id is valid: outer " + outerBookPrimaryId +" or inner  : "+ innerBookPrimaryId);
+                    outerBookPrimaryId = repository.getPIdByOLId(BookDetailActivity.this.openLibraryId).get(0);
+                    Log.d("BookDetailActivity", " 1103 O found  the primary ids outer " + outerBookPrimaryId + " or inner  : " + innerBookPrimaryId);
                 } else {
-                    innerBookPrimaryId = repository.getBookId(BookDetailActivity.this.openLibraryId).get(0);
-                    Log.d("BookDetailActivity", " 1103 found  the primary id is valid: outer " + outerBookPrimaryId +" or inner  : "+ innerBookPrimaryId);
+                    innerBookPrimaryId = repository.getPIdByOLId(BookDetailActivity.this.openLibraryId).get(0);
+                    Log.d("BookDetailActivity", " 1103 I found  the primary ids  outer " + outerBookPrimaryId + " or inner  : " + innerBookPrimaryId);
                 }
 
             }
@@ -182,6 +190,34 @@ public class BookDetailActivity extends BaseActivity {
             }
 
         }
+
+        //Set toggle button clicks
+        btnAddLinkToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Mentions mentionPair = new Mentions(outerBookPrimaryId, innerBookPrimaryId);
+                MentionsRepository mentionsRepository = new MentionsRepository((Application) getApplicationContext());
+
+                if (isChecked) {
+                    // The toggle is enabled
+                    Toast.makeText(getBaseContext(), "Added book link", Toast.LENGTH_SHORT).show();
+                    Log.d("BookDetailActivity", " 1103 clicked the add link ");
+                    //3.Update the mentions db for the [main, mentioned] case
+                    if (outerBookPrimaryId != -1 && innerBookPrimaryId != -1) {
+                        Log.d("BookDetailActivity", " 1103 both of the primary id is valid: outer " + outerBookPrimaryId + " or inner : " + innerBookPrimaryId);
+                        mentionsRepository.insert(mentionPair);
+                        Log.d("BookDetailActivity", " 1103 Insertion initiated for mentions");
+                    } else {
+                        Log.d("BookDetailActivity", " 1103 either of the primary id is not valid: outer " + outerBookPrimaryId + " or inner : " + innerBookPrimaryId);
+
+
+                    }
+                } else {
+                    // The toggle is disabled
+                    mentionsRepository.deleteMention(mentionPair);
+                }
+            }
+        });
+
     }
 
     /*  Function : Capitalizes first letter of each word (non functional).
@@ -204,20 +240,34 @@ public class BookDetailActivity extends BaseActivity {
             }
         }
 
-        Log.d("FragmentedDetailedBook","1103 formatted String is " + formattedString);
+        Log.d("BookDetailActivity", "1103 formatted String is " + formattedString);
         return formattedString;
 
     }
 
-    private void insertBookInDb(OLBook book){
-
+    private void insertBookInDb(OLBook book) {
 
 
         //TODO.V2 primary id is returned when insert happens; Check if that can be used here. ** Change in V2 **
         // It will save one query for geting primary id for inserted book. below
 
 
-        repository.insert(new Book(
+        //check if book already in db.
+
+        Integer bookCheckPID = -1;
+        try {
+            bookCheckPID = repository.getPIdByOLId(BookDetailActivity.this.openLibraryId).get(0);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+
+        //if book is already present and is in personal shelf
+        if (bookCheckPID == -1) {
+
+            repository.insert(new Book(
                     BookDetailActivity.this.openLibraryId,
                     BookDetailActivity.this.goodreadsId,
                     BookDetailActivity.this.bookTitle,
@@ -225,11 +275,20 @@ public class BookDetailActivity extends BaseActivity {
                     BookDetailActivity.this.author,
                     BookDetailActivity.this.bookPublisher,
                     BookDetailActivity.this.publishYear,
-                    BookDetailActivity.this.nrPagesInBook));
-        // TODO.V2 1.b Update web db
+                    BookDetailActivity.this.nrPagesInBook,
+                    false));
+            // TODO.V2 1.b Update web db
 
+        } else {
+            try {
+                isBookInPersonalShelf = repository.isBookInPersonalShelfByPID(bookCheckPID).get(0);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
     }
-
 
     // Populate data for the book
     private void loadBook(OLBook book) {
@@ -242,18 +301,18 @@ public class BookDetailActivity extends BaseActivity {
         pbDetailBook.setVisibility(View.GONE);
 
         //update the book details whatever is present.
-        if(!bookTitle.isEmpty() && bookTitle!=null)
+        if(!bookTitle.isEmpty() && bookTitle!=null) {
+            subTitle = subTitle.trim();
+            if (!subTitle.isEmpty() && subTitle != null)
+                bookTitle = bookTitle + " : " + subTitle;
+
             tvTitle.setText(bookTitle);
+        }
         else
             tvTitle.setVisibility(View.INVISIBLE);
 
-        if(!subTitle.isEmpty() && subTitle!=null)
-            tvSubTitle.setText(subTitle);
-        else
-            tvSubTitle.setVisibility(View.INVISIBLE);
-
         if(!author.isEmpty() && author!=null)
-            tvAuthor.setText(author);
+            tvAuthor.setText("By " + author);
         else
             tvAuthor.setVisibility(View.INVISIBLE);
 
@@ -265,34 +324,7 @@ public class BookDetailActivity extends BaseActivity {
         }
 
 
-        btnAddLink.setVisibility(View.VISIBLE);
-        btnAddLink.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                Toast.makeText(getBaseContext(), "Added book link", Toast.LENGTH_SHORT).show();
-                Log.d("BookDetailActivity", " 1103 clicked the add link ");
-                //3.Update the mentions db for the [main, mentioned] case
-                if(outerBookPrimaryId!=-1 && innerBookPrimaryId!=-1)
-                {
-                    Log.d("BookDetailActivity", " 1103 either of the primary id is valid: outer " + outerBookPrimaryId +" or inner : "+innerBookPrimaryId);
-
-                    Mentions mentionPair = new Mentions(outerBookPrimaryId,innerBookPrimaryId);
-                    MentionsRepository mentionsRepository = new MentionsRepository((Application) getApplicationContext());
-                    mentionsRepository.insert(mentionPair);
-                    Log.d("BookDetailActivity", " 1103 Instertion initiated for mentions");
-                }
-                else {
-                    Log.d("BookDetailActivity", " 1103 either of the primary id is not valid: outer " + outerBookPrimaryId +" or inner : "+ innerBookPrimaryId);
-
-
-                }
-
-
-
-            }
-
-        });
+        btnAddLinkToggle.setVisibility(View.VISIBLE);
 
         // fetch extra book data from books API
         client = new OLBookClient();

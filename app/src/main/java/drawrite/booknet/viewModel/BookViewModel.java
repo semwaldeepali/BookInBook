@@ -14,12 +14,14 @@ import drawrite.booknet.repository.BookRepository;
 public class BookViewModel extends AndroidViewModel {
     private BookRepository repository;
     private LiveData<List<Book>> allBooks;
+    private LiveData<List<Book>> personalShelfBooks;
 
 
     public BookViewModel(@NonNull Application application) {
         super(application);
         repository = new BookRepository(application);
         allBooks = repository.getAllBooks();
+        personalShelfBooks = repository.getPersonalShelfBooks();
     }
 
     public void insert(Book book){
@@ -29,6 +31,15 @@ public class BookViewModel extends AndroidViewModel {
     public void update(Book book){
         repository.update(book);
     }
+
+    public void addToPersonalShelf(Integer primaryId) {
+        repository.addToPersonalShelf(primaryId);
+    }
+
+    public void removeFromPersonalShelf(Integer primaryId) {
+        repository.removeFromPersonalShelf(primaryId);
+    }
+
 
     public void delete(Book book){
         repository.delete(book);
@@ -42,7 +53,12 @@ public class BookViewModel extends AndroidViewModel {
         return allBooks;
     }
 
+    public LiveData<List<Book>> getPersonalShelfBooks() {
+        return personalShelfBooks;
+    }
+
     public LiveData<List<Book>> getBookByPID(Integer mainBookPrimaryId){ return repository.getBookByPID(mainBookPrimaryId);}
 
-    //public LiveData<List<String>> getBookId(String olId) { return repository.getBookId(olId); }
+
+    //public LiveData<List<String>> getPIdByOLId(String olId) { return repository.getPIdByOLId(olId); }
 }

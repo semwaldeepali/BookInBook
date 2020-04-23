@@ -5,27 +5,22 @@ import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.ViewGroup;
 import android.widget.SearchView;
 import android.widget.Toast;
 
-import java.util.List;
-
-import drawrite.booknet.model.Book;
 
 public class SearchableActivity extends AppCompatActivity {
 
     public static final String EXTRA_QUERY = "extraQuery";
     public static final String DRAWRITE_NOCONNECTION = "NOINTERNETCONNECTION";
+
+    private SearchSuggestionSingleton searchSuggestionSingleton;
 
     ProgressDialog progressDialog;
 
@@ -36,6 +31,7 @@ public class SearchableActivity extends AppCompatActivity {
 
     }
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +40,8 @@ public class SearchableActivity extends AppCompatActivity {
         Log.d("SearchableActivity","onCreateFunction");
 
         // TODO.p5 : Give auto fill search options
+
+        searchSuggestionSingleton = SearchSuggestionSingleton.getInstance();
 
         // Get the intent, verify the action and get the query
         Intent intent = getIntent();
@@ -56,7 +54,7 @@ public class SearchableActivity extends AppCompatActivity {
         }
         else
         {
-            Toast.makeText(this,"No Internet Connection", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "No Internet Connection!", Toast.LENGTH_LONG).show();
         }
         handleIntent(intent,isNetworkAvailable);
 
@@ -88,7 +86,7 @@ public class SearchableActivity extends AppCompatActivity {
         }
         else
         {
-            Toast.makeText(this,"No Internet Connection", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "No Internet Connection!", Toast.LENGTH_LONG).show();
         }
         handleIntent(intent,isNetworkAvailable);
 
@@ -108,11 +106,9 @@ public class SearchableActivity extends AppCompatActivity {
             String query = intent.getStringExtra(SearchManager.QUERY);
             query = query.trim();
 
-            // savin the queries for suggestions
+            // saving the queries for suggestions
+            searchSuggestionSingleton.suggestions.saveRecentQuery(query, null);
 
-            SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
-                    SearchSuggestionProvider.AUTHORITY, SearchSuggestionProvider.MODE);
-            suggestions.saveRecentQuery(query,null);
             if (query != null) {
                 Log.d("SearchableActivity", "Got the search query");
 

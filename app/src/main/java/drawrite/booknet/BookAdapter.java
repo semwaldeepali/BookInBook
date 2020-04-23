@@ -22,13 +22,81 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookHolder> {
 
 
     // list of Books; assigned to new list else might cause action on null datalist
-    private List<Book> books = new ArrayList<>();
-    private OnBookClickListener mOnBookClickListener;
+    private List<Book> mBooksList = new ArrayList<>();
+    private OnItemClickListener mOnBookClickListener;
     private Context mContext;
 
+
+    public interface OnItemClickListener {
+
+        // Handling the click on item
+        void onBookClick(int position, Integer primaryId);
+
+        // Handling click on Bin Image
+        void onDeleteClick(int position, Integer primaryId);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        mOnBookClickListener = listener;
+    }
+
+
+    class BookHolder extends RecyclerView.ViewHolder {
+
+        public final View mView;
+        TextView title;
+        TextView author;
+        //TextView subtitle;
+        ImageView ivBookCover;
+        ImageView mDeleteItem;
+        OnItemClickListener onBookClickListener;
+        private Integer primaryId;
+
+        BookHolder(View itemView, final OnItemClickListener onBookClickListener) {
+            super(itemView);
+            mView = itemView;
+            title = mView.findViewById(R.id.tvTitle);
+            //subtitle = mView.findViewById(R.id.tvSubtitle);
+            author = mView.findViewById(R.id.tvAuthor);
+            ivBookCover = mView.findViewById(R.id.ivBookCover);
+            mDeleteItem = mView.findViewById(R.id.ivDelete);
+            this.onBookClickListener = onBookClickListener;
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (onBookClickListener != null) {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            onBookClickListener.onBookClick(position, primaryId);
+                        }
+                    }
+                }
+            });
+
+
+            mDeleteItem.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (onBookClickListener != null) {
+
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            onBookClickListener.onDeleteClick(position, primaryId);
+                        }
+
+                    }
+
+                }
+            });
+
+        }
+
+    }
+
     //TODO : change the local variable nomenclature to mSomthing
-    public BookAdapter(List<Book> books, OnBookClickListener onBookClickListener, Context context){
-        this.books = books;
+    public BookAdapter(List<Book> books, OnItemClickListener onBookClickListener, Context context) {
+        this.mBooksList = books;
         this.mOnBookClickListener = onBookClickListener;
         this.mContext = context;
 
@@ -45,19 +113,21 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull BookHolder holder, int position){
-        Book currentBook = books.get(position);
-        holder.title.setText(currentBook.getTitle());
-        holder.author.setText(currentBook.getAuthor());
-        if(currentBook.getSubTitle()!=null)
-            holder.subtitle.setText(String.valueOf(currentBook.getSubTitle()));
-        else
-            holder.subtitle.setVisibility(View.GONE);
-        holder.ivBookCover.setImageResource(R.drawable.ic_book_cover);
+        Book currentBook = mBooksList.get(position);
+        holder.author.setText("by " + currentBook.getAuthor());
+        String completeTitle = currentBook.getTitle();
+        String subtitle = currentBook.getSubTitle();
+        subtitle = subtitle.trim();
+        if (subtitle != null && !subtitle.isEmpty())
+            completeTitle = completeTitle + ": " + String.valueOf(currentBook.getSubTitle());
+        holder.title.setText(completeTitle);
+        holder.ivBookCover.setImageResource(R.drawable.ic_bookcover_front);
         holder.primaryId = currentBook.getId();
+
         // DIRTY way of loading book cover
         // Populate image data
         // cannot directly set picasso without getting activity context
-        Picasso.with(this.mContext).load(Uri.parse("http://covers.openlibrary.org/b/olid/" + currentBook.getOlid() + "-L.jpg?default=false")).error(R.drawable.ic_book_cover).into(holder.ivBookCover);
+        Picasso.with(this.mContext).load(Uri.parse("http://covers.openlibrary.org/b/olid/" + currentBook.getOlid() + "-L.jpg?default=false")).error(R.drawable.ic_bookcover_front).into(holder.ivBookCover);
 
 
     }
@@ -65,53 +135,22 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookHolder> {
     @Override
     public int getItemCount(){
 
-        return books.size();
+        return mBooksList.size();
     }
 
     public void setBooks(List<Book> books) {
-        this.books = books;
+        this.mBooksList = books;
         notifyDataSetChanged();
     }
 
     //add new books
     public void addBooks(List<Book> books) {
-        this.books.addAll(books);
+        this.mBooksList.addAll(books);
         notifyDataSetChanged();
     }
 
-    class BookHolder extends  RecyclerView.ViewHolder implements View.OnClickListener {
 
-        public final View mView;
-        TextView title;
-        TextView author;
-        TextView subtitle;
-        ImageView ivBookCover;
-        OnBookClickListener onBookClickListener;
-        private Integer primaryId;
 
-        BookHolder(View itemView, OnBookClickListener onBookClickListener){
-            super(itemView);
-            mView = itemView;
-            title = mView.findViewById(R.id.tvTitle);
-            subtitle = mView.findViewById(R.id.tvSubtitle);
-            author = mView.findViewById(R.id.tvAuthor);
-            ivBookCover = mView.findViewById(R.id.ivBookCover);
-            this.onBookClickListener = onBookClickListener;
-            itemView.setOnClickListener(this);
-
-        }
-
-        @Override
-        public void onClick(View view)
-        {
-
-            onBookClickListener.OnBookClick(getAdapterPosition(), primaryId);
-        }
-    }
-
-    public interface OnBookClickListener{
-        void OnBookClick(int position, Integer primaryId);
-    }
 
 
 }

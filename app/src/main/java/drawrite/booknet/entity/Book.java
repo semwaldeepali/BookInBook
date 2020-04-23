@@ -38,8 +38,11 @@ public class Book {
     @ColumnInfo(name = "book_nr_pages")
     private String nrPages;
 
+    @ColumnInfo(name = "book_personal_shelf")
+    private boolean personalShelf;
+
     //constructor
-    public Book(String olid, String goodReadsId, String title, String subTitle, String author, String publisher, String publishYear, String nrPages) {
+    public Book(String olid, String goodReadsId, String title, String subTitle, String author, String publisher, String publishYear, String nrPages, boolean personalShelf) {
         this.olid = olid;
         this.goodReadsId = goodReadsId;
         this.title = title;
@@ -48,6 +51,7 @@ public class Book {
         this.publisher = publisher;
         this.publishYear = publishYear;
         this.nrPages = nrPages;
+        this.personalShelf = personalShelf;
     }
 
     //getters
@@ -81,6 +85,10 @@ public class Book {
 
     public String getNrPages(){
         return nrPages;
+    }
+
+    public boolean getPersonalShelf() {
+        return personalShelf;
     }
 
     //Setters

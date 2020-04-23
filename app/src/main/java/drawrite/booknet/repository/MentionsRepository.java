@@ -68,12 +68,14 @@ public class MentionsRepository {
     public void update(Mentions mentions){
         new UpdateMentionsAsyncTask(mentionsDao).execute(mentions);
     }
-    public void delete(Mentions mentions){
+
+    public void deleteMention(Mentions mentions) {
         new DeleteMentionsAsyncTask(mentionsDao).execute(mentions);
     }
     public void deleteAllMentions(){
         new DeleteMentionsAsyncTask(mentionsDao).execute();
     }
+
 
     public LiveData<List<Mentions>> getAllMentions() {
         return allMentions;

@@ -36,8 +36,8 @@ public class MentionsViewModel extends AndroidViewModel {
         repository.update(mentions);
     }
 
-    public void delete(Mentions mentions){
-        repository.delete(mentions);
+    public void deleteMention(Mentions mentions) {
+        repository.deleteMention(mentions);
     }
 
     public void deleteAllMentions(){
@@ -51,5 +51,5 @@ public class MentionsViewModel extends AndroidViewModel {
     //TODO : implement remaining methods here.
     //public LiveData<List<Mentions>> getMentionsByBookIds(Integer mainBookPrimaryId){ return repository.getMentionsByBookIds(mainBookPrimaryId);}
 
-    //public LiveData<List<String>> getBookId(String olId) { return repository.getBookId(olId); }
+    //public LiveData<List<String>> getPIdByOLId(String olId) { return repository.getPIdByOLId(olId); }
 }

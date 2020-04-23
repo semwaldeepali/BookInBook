@@ -14,18 +14,29 @@
 
 
         <item
-            android:id="@+id/nav_viewBook"
-            android:icon="@drawable/ic_view"
-            android:title="Explore Shelf"
-
-            />
-        <!--
-
-        <item
             android:id="@+id/nav_profile"
             android:icon="@drawable/ic_profile"
-            android:title="Profile" />
-            -->
+            android:title="My Shelf" />
+
+        <item
+            android:id="@+id/nav_viewBook"
+            android:icon="@drawable/ic_view"
+            android:title="Explore"
+
+            />
+
+        <item
+            android:id="@+id/nav_Help"
+            android:icon="@drawable/ic_help"
+            android:title="Help"
+
+            />
+        <item
+            android:id="@+id/nav_Settings"
+            android:icon="@drawable/ic_settings"
+            android:title="Settings"
+
+            />
 
     </group>
 

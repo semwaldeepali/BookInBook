@@ -30,13 +30,17 @@
           android:visibility="visible"
           />
 
-      <ImageView
-          android:id="@+id/iv_empty_inner_book"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:src="@drawable/ic_hourglass"
-          android:layout_gravity="center"
-          android:visibility="invisible" />
+        <TextView
+            android:id="@+id/tvEmptyInnerBook"
+            android:text="@string/empty_inner_books"
+            android:textColor="@color/colorAccent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical|center_horizontal"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:visibility="invisible"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
     </LinearLayout>
 

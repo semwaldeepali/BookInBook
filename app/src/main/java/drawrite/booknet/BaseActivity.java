@@ -6,6 +6,7 @@ package drawrite.booknet;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -21,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.support.v7.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class BaseActivity extends AppCompatActivity implements  NavigationView.OnNavigationItemSelectedListener{
@@ -137,16 +139,24 @@ public class BaseActivity extends AppCompatActivity implements  NavigationView.O
                 intent = new Intent(BaseActivity.this,MainActivity.class);
                 startActivity(intent);
                 break;
-            /*
+
             case R.id.nav_profile:
-                Toast.makeText(this, "profile", Toast.LENGTH_SHORT).show();
+                drawer.closeDrawer(GravityCompat.START);
+                intent = new Intent(BaseActivity.this, PersonalShelfBookListActivity.class);
+                startActivity(intent);
                 break;
-            case R.id.nav_share:
-                Toast.makeText(this, "Share", Toast.LENGTH_SHORT).show();
+
+            case R.id.nav_Help:
+                drawer.closeDrawer(GravityCompat.START);
+                intent = new Intent(BaseActivity.this, HelpInfoActivity.class);
+                startActivity(intent);
                 break;
-            case R.id.nav_send:
-                Toast.makeText(this, "Send", Toast.LENGTH_SHORT).show();
-                break;*/
+
+            case R.id.nav_Settings:
+                drawer.closeDrawer(GravityCompat.START);
+                intent = new Intent(BaseActivity.this, SettingsActivity.class);
+                startActivity(intent);
+                break;
         }
 
 

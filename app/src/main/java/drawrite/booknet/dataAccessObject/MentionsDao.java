@@ -45,6 +45,10 @@ public interface MentionsDao { // NOTE: interface because room will auto generat
     @Query("SELECT * from mentions_table")
     LiveData<List<Mentions>> getAllMentions();
 
+    //Deleting mention
+    @Query("DELETE FROM mentions_table where main_book_id == :mainBookId AND mentions_book_id == :mentionsBookId")
+    void deleteLink(String mainBookId, String mentionsBookId);
+
     //Get the mentions based on main_book_id
     @Query("SELECT mentions_book_id from mentions_table where main_book_id == :mainBookId")
     List<Integer> getMentionsByBookIds(Integer mainBookId);

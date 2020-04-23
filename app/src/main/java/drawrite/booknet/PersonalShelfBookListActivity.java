@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,9 +20,10 @@ import drawrite.booknet.entity.Book;
 import drawrite.booknet.repository.BookRepository;
 import drawrite.booknet.viewModel.BookViewModel;
 
+import static drawrite.booknet.Constant.BOOK_PERSONAL_SHELF;
 import static drawrite.booknet.OLBookListActivity.BOOK_ENTITY_KEY;
 
-public class ViewBookListActivity extends BaseActivity implements BookAdapter.OnItemClickListener {
+public class PersonalShelfBookListActivity extends BaseActivity implements BookAdapter.OnItemClickListener {
 
     private BookViewModel bookViewModel;
     private RecyclerView recyclerView;
@@ -32,12 +34,12 @@ public class ViewBookListActivity extends BaseActivity implements BookAdapter.On
     @Override
     public void onStart() {
         super.onStart();
-        Log.d("ViewBookListActivity"," Active");
+        Log.d("LocalShelfActivity", " Active");
 
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_list);
@@ -46,7 +48,7 @@ public class ViewBookListActivity extends BaseActivity implements BookAdapter.On
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setHasFixedSize(true); //makes something done under the hood efficient
 
-        adapter = new BookAdapter(new ArrayList<Book>(), this,this);
+        adapter = new BookAdapter(new ArrayList<Book>(), this, this);
         recyclerView.setAdapter(adapter);
 
         //Progress Bar
@@ -56,7 +58,7 @@ public class ViewBookListActivity extends BaseActivity implements BookAdapter.On
         bookViewModel = ViewModelProviders.of(this).get(BookViewModel.class);
 
         // observer of the live data
-        bookViewModel.getAllBooks().observe(this, new Observer<List<Book>>(){
+        bookViewModel.getPersonalShelfBooks().observe(this, new Observer<List<Book>>() {
             @Override
             public void onChanged(@Nullable List<Book> books) {
                 adapter.setBooks(books);
@@ -69,32 +71,29 @@ public class ViewBookListActivity extends BaseActivity implements BookAdapter.On
     }
 
 
-
     @Override
     public void onBookClick(int position, Integer primaryId) {
 
-
         // 1. Starting detail activity
         Intent intent;
-        intent = new Intent(ViewBookListActivity.this, BookDetailActivityTabbed.class);
+        intent = new Intent(PersonalShelfBookListActivity.this, BookDetailActivityTabbed.class);
 
+        intent.putExtra(BOOK_PERSONAL_SHELF, true);
         intent.putExtra(BOOK_ENTITY_KEY, primaryId);
 
-        Log.d("ViewBookListActivity", "1103 Intent Extra ! " + primaryId );
+        Log.d("PersonalShelfActivity", "1103 Intent Extra ! " + primaryId);
 
         startActivity(intent);
 
     }
 
-    @Override
-    public void onDeleteClick(int position, Integer primaryID) {
 
+    @Override
+    public void onDeleteClick(int position, Integer primaryId) {
         BookRepository repository = new BookRepository((Application) getApplicationContext());
-        repository.deleteBookByPID(primaryID);
+        repository.removeFromPersonalShelf(primaryId);
 
     }
-
-
 }
 
 

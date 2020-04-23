@@ -41,13 +41,17 @@ public interface BookDao { // NOTE: interface because room will auto generate th
     @Query("DELETE FROM book_table")
     void deleteAllBooks();
 
+    //Delete book by primary id
+    @Query("DELETE FROM book_table WHERE id = :primaryID ")
+    void deleteBookByPID(Integer primaryID);
+
     // NOTE: Simple query without parameters that returns values.
     @Query("SELECT * from book_table")
     LiveData<List<Book>> getAllBooks();
 
     // Query to get book id corresponding to olid
     @Query("SELECT id from book_table WHERE book_ol_id = :ol_id") //single = sign
-    List<Integer> getBookId(String ol_id);
+    List<Integer> getPIdByOLId(String ol_id);
 
     // Get list of books based on primary id
     @Query("SELECT * from book_table WHERE id = :primaryId")
@@ -57,6 +61,19 @@ public interface BookDao { // NOTE: interface because room will auto generate th
 
     @Query("SELECT * from book_table WHERE book_title = :bookTitle")
     LiveData<List<Book>> getBookByTitle(String bookTitle);
+
+    @Query("SELECT * from book_table WHERE book_personal_shelf = 1")
+    LiveData<List<Book>> getPersonalShelf();
+
+    @Query("UPDATE book_table SET book_personal_shelf = 1 WHERE id = :primaryId")
+    void addToPersonalShelf(Integer primaryId);
+
+
+    @Query("UPDATE book_table SET book_personal_shelf = 0 WHERE id = :primaryId")
+    void removeFromPersonalShelf(Integer primaryId);
+
+    @Query("SELECT book_personal_shelf FROM book_table WHERE id = :primaryId")
+    List<Boolean> isBookInPersonalShelfByPID(Integer primaryId);
 
 
 }

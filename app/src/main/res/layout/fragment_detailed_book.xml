@@ -45,14 +45,6 @@
                     android:layout_marginTop="8dp"
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp" />
-                <TextView
-                    android:id="@+id/tvSubTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="32sp"
-                    android:layout_marginTop="8dp"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp" />
 
 
                 <TextView
@@ -98,17 +90,25 @@
                     android:layout_height="1px"
                     android:layout_marginTop="8dp" />
 
-                <Button
-                    android:id="@+id/btnAddEdge"
-                    android:layout_width="match_parent"
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switchButton"
+                    android:layout_width="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:checked="false"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Add book to My Shelf" />
+
+
+                <ToggleButton
+                    android:id="@+id/tbAddLink"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Add Link"
-                    android:background="@color/colorAccent"
-                    android:textColor="@color/colorPrimary"
                     android:visibility="invisible"
+                    android:textOff="Books not Linked"
+                    android:textOn="Books Linked"
                     />
-
 
 
             </LinearLayout>

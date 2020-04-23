@@ -19,8 +19,9 @@ public class OLBookAdapter extends ArrayAdapter<OLBook> {
 
     private static class ViewHolder {
         public ImageView ivCover;
+        public ImageView ivDelete;
         public TextView tvTitle;
-        public TextView tvSubtitle;
+        //public TextView tvSubtitle;
         public TextView tvAuthor;
     }
 
@@ -35,6 +36,7 @@ public class OLBookAdapter extends ArrayAdapter<OLBook> {
     public View getView(int position, View convertView, ViewGroup parent) {
         // Get the data item for this position
         final OLBook book = getItem(position);
+        String completeTitle = "";
 
         // Check if an existing view is being reused, otherwise inflate the view
         ViewHolder viewHolder; // view lookup cache stored in tag
@@ -44,23 +46,27 @@ public class OLBookAdapter extends ArrayAdapter<OLBook> {
             convertView = inflater.inflate(R.layout.ol_book_item, parent, false);
             viewHolder.ivCover = (ImageView)convertView.findViewById(R.id.ivBookCover);
             viewHolder.tvTitle = (TextView)convertView.findViewById(R.id.tvTitle);
-            viewHolder.tvSubtitle = (TextView)convertView.findViewById(R.id.tvSubTitle);
+            //viewHolder.tvSubtitle = (TextView)convertView.findViewById(R.id.tvSubtitle);
             viewHolder.tvAuthor = (TextView)convertView.findViewById(R.id.tvAuthor);
+            viewHolder.ivDelete = convertView.findViewById(R.id.ivDelete);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        // Populate the data into the template view using the data object
 
-        viewHolder.tvTitle.setText(book.getTitle());
-        viewHolder.tvAuthor.setText(book.getAuthor());
+
+        // Delete icon dosen't make sense in this list
+        viewHolder.ivDelete.setVisibility(View.GONE);
+        // Populate the data into the template view using the data object
+        completeTitle = book.getTitle();
+        viewHolder.tvAuthor.setText("by " + book.getAuthor());
         String subtitle = book.getSubTitle();
+        subtitle = subtitle.trim();
         if(!subtitle.isEmpty() && subtitle!=null){
-            viewHolder.tvSubtitle.setText(subtitle);
+            completeTitle = completeTitle + ": " + subtitle;
         }
-        else {
-            viewHolder.tvSubtitle.setVisibility(View.GONE);
-        }
+        viewHolder.tvTitle.setText(completeTitle);
+
 
         Picasso.with(getContext()).load(Uri.parse(book.getCoverUrl())).error(R.drawable.ic_nocover).into(viewHolder.ivCover);
 

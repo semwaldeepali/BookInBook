@@ -69,11 +69,11 @@ public abstract class BookNetDatabase extends RoomDatabase {
         @Override
         protected  Void doInBackground(Void... voids){
             //TODO : add more basic data
-            bookDao.insertBook(new Book("olid 1","grid 1",
-                    "title 1","sub title 1","author 1",
-                    "publisher 1","publishyear 1",
-                    "nrPages 1" ));
-
+            bookDao.insertBook(new Book("OL27934180M", "833896",
+                    "Catcher in the Rye", "", "James C. Scott",
+                    "Prestwick House, Incorporated", "1951",
+                    "277", false));
+            /*
             bookDao.insertBook(new Book("olid 2","grid 2",
                     "title 2","sub title 2","author 2",
                     "publisher 2","publishyear 2",
@@ -85,6 +85,7 @@ public abstract class BookNetDatabase extends RoomDatabase {
                     "publisher 3","publish year 3",
                     "nr Pages 3" ));
             mentionsDao.insertMentions(new Mentions(1,2 ));
+            */
             return null;
         }
 

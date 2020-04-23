@@ -24,10 +24,13 @@ public class BookRepository {
 
     private LiveData<List<Book>> allBooks;
 
+    private LiveData<List<Book>> personalShelfBooks;
+
     public BookRepository(Application application){
         BookNetDatabase database = BookNetDatabase.getInstance(application);
         bookDao = database.bookDao();
         allBooks = bookDao.getAllBooks();
+        personalShelfBooks = bookDao.getPersonalShelf();
     }
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
@@ -42,9 +45,20 @@ public class BookRepository {
         new DeleteBookAsyncTask(bookDao).execute(book);
     }
     public void deleteAllBooks(){
-        new DeleteBookAsyncTask(bookDao).execute();
+        new DeleteAllBookAsyncTask(bookDao).execute();
     }
 
+    public void deleteBookByPID(Integer primaryID) {
+        new DeleteBookByBPID(bookDao).execute(primaryID);
+    }
+
+    public void addToPersonalShelf(Integer primaryId) {
+        new AddToPersonalShelfAsyncTask(bookDao).execute(primaryId);
+    }
+
+    public void removeFromPersonalShelf(Integer primaryId) {
+        new RemoveFromPersonalShelfAsyncTask(bookDao).execute(primaryId);
+    }
 
     public LiveData<List<Book>> getBookByPID(Integer mainBookPrimaryId){
         return  bookDao.getBookByPID(mainBookPrimaryId);
@@ -58,6 +72,53 @@ public class BookRepository {
         return allBooks;
     }
 
+    public LiveData<List<Book>> getPersonalShelfBooks() {
+        return personalShelfBooks;
+    }
+
+    //Async task to update the personal shelf
+    private static class AddToPersonalShelfAsyncTask extends AsyncTask<Integer, Void, Void> {
+        private BookDao bookDao;
+
+        private AddToPersonalShelfAsyncTask(BookDao bookDao) {
+            this.bookDao = bookDao;
+        }
+
+        @Override
+        protected Void doInBackground(Integer... primaryIds) {
+            bookDao.addToPersonalShelf(primaryIds[0]);
+            return null;
+        }
+    }
+
+    private static class RemoveFromPersonalShelfAsyncTask extends AsyncTask<Integer, Void, Void> {
+        private BookDao bookDao;
+
+        private RemoveFromPersonalShelfAsyncTask(BookDao bookDao) {
+            this.bookDao = bookDao;
+        }
+
+        @Override
+        protected Void doInBackground(Integer... primaryIds) {
+            bookDao.removeFromPersonalShelf(primaryIds[0]);
+            return null;
+        }
+    }
+
+    public List<Boolean> isBookInPersonalShelfByPID(final Integer primaryID) throws ExecutionException, InterruptedException {
+
+        Callable<List<Boolean>> callable = new Callable<List<Boolean>>() {
+            @Override
+            public List<Boolean> call() throws Exception {
+                return bookDao.isBookInPersonalShelfByPID(primaryID);
+            }
+        };
+
+        Future<List<Boolean>> future = Executors.newSingleThreadExecutor().submit(callable);
+
+        return future.get();
+    }
+
     // Get list of books based on primary id
 
 
@@ -66,12 +127,12 @@ public class BookRepository {
     // Approach 2 : declaring an async response interface Source :
     // Approach 3 : Using Callable and Futures ; Source https://stackoverflow.com/questions/51013167/room-cannot-access-database-on-the-main-thread-since-it-may-potentially-lock-th
 
-    public List<Integer> getBookId(final String olId) throws ExecutionException, InterruptedException {
+    public List<Integer> getPIdByOLId(final String olId) throws ExecutionException, InterruptedException {
 
         Callable<List<Integer>> callable = new Callable<List<Integer>>() {
             @Override
             public List<Integer> call() throws Exception {
-                return bookDao.getBookId(olId);
+                return bookDao.getPIdByOLId(olId);
             }
         };
 
@@ -132,6 +193,20 @@ public class BookRepository {
         @Override
         protected Void doInBackground(Book... books) {
             bookDao.deleteAllBooks();
+            return null;
+        }
+    }
+
+    private static class DeleteBookByBPID extends AsyncTask<Integer, Void, Void> {
+        private BookDao bookDao;
+
+        private DeleteBookByBPID(BookDao bookDao) {
+            this.bookDao = bookDao;
+        }
+
+        @Override
+        protected Void doInBackground(Integer... primaryIDs) {
+            bookDao.deleteBookByPID(primaryIDs[0]);
             return null;
         }
     }

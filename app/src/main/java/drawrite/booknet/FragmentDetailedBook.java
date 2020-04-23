@@ -9,12 +9,16 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.SwitchCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -46,21 +50,17 @@ public class FragmentDetailedBook extends Fragment {
 
     private View view;
     private ImageView ivBookCover;
-
     private TextView tvTitle;
-    private TextView tvSubTitle;
     private TextView tvAuthor;
     private TextView tvPublishedByText;
     private TextView tvPublishedByYearText;
     private TextView tvPageCountText;
-
     private ProgressBar pbDetailedBook;
+    private SwitchCompat switchCompat;
 
     private OLBookClient client;
     private boolean detailFromLocal = false;
-
     private Integer primaryId;
-
 
     private BookViewModel bookViewModel;
 
@@ -88,13 +88,18 @@ public class FragmentDetailedBook extends Fragment {
         // Fetch views
         ivBookCover =  view.findViewById(R.id.ivBookCover);
         tvTitle =  view.findViewById(R.id.tvTitle);
-        tvSubTitle =  view.findViewById(R.id.tvSubTitle);
         tvAuthor =  view.findViewById(R.id.tvAuthor);
-
         tvPublishedByText = view.findViewById(R.id.tvPublishedByText);
         tvPageCountText = view.findViewById(R.id.tvPageCountText);
         tvPublishedByYearText = view.findViewById(R.id.tvPublishedYearText);
 
+
+        // Gets the view model access as per the android
+        bookViewModel = ViewModelProviders.of(this).get(BookViewModel.class);
+
+        //My Shelf books
+        switchCompat = (SwitchCompat) view.findViewById(R.id.switchButton);
+        switchCompat.setChecked(false);
 
         //Progress Bar
         pbDetailedBook = view.findViewById(R.id.detailed_book_progressbar);
@@ -108,8 +113,13 @@ public class FragmentDetailedBook extends Fragment {
             // Intent has been raised for fresh query
             OLBook book = (OLBook) intent.getSerializableExtra(OLBookListActivity.BOOK_DETAIL_KEY);
             loadBook(book);
+
         }
         else if(intent.hasExtra(OLBookListActivity.BOOK_ENTITY_KEY)){
+
+            if (intent.hasExtra(Constant.BOOK_PERSONAL_SHELF)) {
+                switchCompat.setChecked(true);
+            }
 
             detailFromLocal = true;
             primaryId =  intent.getIntExtra(OLBookListActivity.BOOK_ENTITY_KEY,-1);
@@ -117,8 +127,6 @@ public class FragmentDetailedBook extends Fragment {
 
             if(primaryId!=-1)
             {
-            // Gets the view model access as per the android
-            bookViewModel = ViewModelProviders.of(this).get(BookViewModel.class);
 
             // observer of the live data
             bookViewModel.getBookByPID(primaryId).observe(this, new Observer<List<Book>>(){
@@ -138,6 +146,15 @@ public class FragmentDetailedBook extends Fragment {
         }
 
 
+        switchCompat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked)
+                    bookViewModel.addToPersonalShelf(bookDetailActivityTabbed.detailedBookPrimaryId);
+                else
+                    bookViewModel.removeFromPersonalShelf(bookDetailActivityTabbed.detailedBookPrimaryId);
+            }
+        });
 
 
         return view;
@@ -192,6 +209,7 @@ public class FragmentDetailedBook extends Fragment {
                 subTitle = book.getSubTitle();
                 author = book.getAuthor();
                 publishYear = book.getPublishYear();
+            switchCompat.setChecked(book.getPersonalShelf());
 
                 //setting the mainBookId variable of the parent activity.
                 bookDetailActivityTabbed.detailedBookOlId = bookOlId ;
@@ -218,20 +236,17 @@ public class FragmentDetailedBook extends Fragment {
 
                 //update the book details whatever is present.
                 if (!bookTitle.isEmpty() && bookTitle != null) {
+                    subTitle = subTitle.trim();
+                    if (!subTitle.isEmpty() && subTitle != null)
+                        bookTitle = bookTitle + ": " + subTitle;
+
                     tvTitle.setText(bookTitle);
                 }
                 else
                     tvTitle.setVisibility(View.INVISIBLE);
 
-                if (!subTitle.isEmpty() && subTitle != null) {
-
-                    tvSubTitle.setText(subTitle);
-                }
-                else
-                    tvSubTitle.setVisibility(View.INVISIBLE);
-
                 if (!author.isEmpty() && author != null)
-                    tvAuthor.setText(author);
+                    tvAuthor.setText("By " + author);
                 else
                     tvAuthor.setVisibility(View.INVISIBLE);
 
@@ -340,7 +355,7 @@ public class FragmentDetailedBook extends Fragment {
                     // clean up accesing bookid multiple times
 
                     //Setting detailedBookPrimaryId
-                    bookDetailActivityTabbed.detailedBookPrimaryId = repository.getBookId(bookOlId).get(0);
+                    bookDetailActivityTabbed.detailedBookPrimaryId = repository.getPIdByOLId(bookOlId).get(0);
                     Log.d("FragmentDetailedBook", " 1103 set main book ol id : " + bookDetailActivityTabbed.detailedBookPrimaryId);
 
                 } catch (ExecutionException e) {
@@ -358,16 +373,16 @@ public class FragmentDetailedBook extends Fragment {
 
             //update the book details whatever is present.
             if (!bookTitle.isEmpty() && bookTitle != null){
+                subTitle = subTitle.trim();
+
+                if (!subTitle.isEmpty() && subTitle != null)
+                    bookTitle = bookTitle + ": " + subTitle;
 
                 tvTitle.setText(bookTitle);
             }
             else
                 tvTitle.setVisibility(View.INVISIBLE);
 
-            if (!subTitle.isEmpty() && subTitle != null)
-                tvSubTitle.setText(subTitle);
-            else
-                tvSubTitle.setVisibility(View.INVISIBLE);
 
             if (!author.isEmpty() && author != null)
                 tvAuthor.setText("By : "+ author);

@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import drawrite.booknet.entity.Book;
+import drawrite.booknet.entity.Mentions;
 import drawrite.booknet.repository.MentionsRepository;
 import drawrite.booknet.viewModel.BookViewModel;
 
@@ -36,7 +37,7 @@ import static drawrite.booknet.SearchableActivity.EXTRA_QUERY;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class FragmentOuterBooks extends Fragment implements SearchDialog.SearchDialogListener, BookAdapter.OnBookClickListener  {
+public class FragmentOuterBooks extends Fragment implements SearchDialog.SearchDialogListener, BookAdapter.OnItemClickListener {
 
     // variable for accessing mainBookOlId variable common across fragments.
     private BookDetailActivityTabbed bookDetailActivityTabbed;
@@ -52,8 +53,6 @@ public class FragmentOuterBooks extends Fragment implements SearchDialog.SearchD
     private ProgressBar pbOuterBook;
 
 
-    private TextView mTvBookTitleOuter;
-    private TextView mTvBookSubTitleOuter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -81,7 +80,6 @@ public class FragmentOuterBooks extends Fragment implements SearchDialog.SearchD
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getContext(), "this book is mentioned in ... book!!", Toast.LENGTH_SHORT).show();
                 // Resource : https://codinginflow.com/tutorials/android/custom-dialog-interface
                 // opens the search box for the book to be link
                 openSearchDialog();
@@ -145,13 +143,12 @@ public class FragmentOuterBooks extends Fragment implements SearchDialog.SearchD
         }else {
             Log.d("FragmentOuterBooks", "1103 outerBookIdList not Empty" );
             pbOuterBook.setVisibility(View.GONE);
-            view.findViewById(R.id.iv_empty_outer_book).setVisibility(View.VISIBLE);
+            view.findViewById(R.id.tvEmptyOuterBook).setVisibility(View.VISIBLE);
         }
 
         return view;
     }
     public void openSearchDialog(){
-        Toast.makeText(getContext(), "search dialog opened ", Toast.LENGTH_SHORT).show();
 
         SearchDialog searchDialog = new SearchDialog();
         //setting the context
@@ -170,31 +167,26 @@ public class FragmentOuterBooks extends Fragment implements SearchDialog.SearchD
 
         // Approach 1: [Dirty] Duplicate the search dialog & book detail activity
         OLintent.putExtra(IS_FRESH_QUERY,false);
-        OLintent.putExtra(BOOKNET_INNER_BOOK_OLID,detailedBookOlId);
+        OLintent.putExtra(BOOKNET_INNER_BOOK_OLID, bookDetailActivityTabbed.detailedBookOlId);
         OLintent.putExtra(BOOKNET_INNER_BOOK_PID,bookDetailActivityTabbed.detailedBookPrimaryId);
 
         Log.d("FragmentOuterBooks", "1103 is fresh query ?  false " );
         Log.d("FragmentOuterBooks", "1103 query book name   " + bookName);
-        Log.d("FragmentOuterBooks", "1103 mentioned book ol id   " + detailedBookOlId);
-        Log.d("FragmentOuterBooks", "1103 mentioned book primary id   " + bookDetailActivityTabbed.detailedBookPrimaryId);
+        Log.d("FragmentOuterBooks", "1103 inner book ol id   " + bookDetailActivityTabbed.detailedBookOlId);
+        Log.d("FragmentOuterBooks", "1103 inner book primary id   " + bookDetailActivityTabbed.detailedBookPrimaryId);
 
 
         startActivity(OLintent);
-        Toast.makeText(getContext(), "got book name to search : " + bookName +"Main book ol id "+ detailedBookOlId, Toast.LENGTH_SHORT).show();
 
     }
 
     @Override
-    public void OnBookClick(int position, Integer primaryId) {
+    public void onBookClick(int position, Integer primaryId) {
         // 1. Asynchronous adding the book to the local
         // TODO.V2: Web updating ; [Also, if this is the best place to update local cache]
-        Toast.makeText(getContext(), "Book Clicked !! " + primaryId, Toast.LENGTH_SHORT).show();
-
-
         // 1. Starting detail activity
         Intent intent;
         intent = new Intent(getContext(), BookDetailActivityTabbed.class);
-
         intent.putExtra(BOOK_ENTITY_KEY, primaryId);
         startActivity(intent);
         Log.d("FragmentOuterBooks", "1103 started intent " );
@@ -202,6 +194,14 @@ public class FragmentOuterBooks extends Fragment implements SearchDialog.SearchD
 
     }
 
+    @Override
+    public void onDeleteClick(int position, Integer primaryId) {
+
+        MentionsRepository mentionsRepository = new MentionsRepository((Application) getActivity().getApplicationContext());
+
+        //primary id is for outer book
+        mentionsRepository.deleteMention(new Mentions(primaryId, bookDetailActivityTabbed.detailedBookPrimaryId));
+    }
 
 
 }
